@@ -14,7 +14,7 @@ class Lexer {
     public:
         Lexer(std::string input) {
             code = input;
-            codePointerInLine = 0;
+            codePointerInCode = 0;
             lineno = 0;
 
             identifierRegex = std::regex("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -27,7 +27,7 @@ class Lexer {
 
     private:
         std::string code;
-        int codePointerInLine;
+        int codePointerInCode;
         int lineno;
         std::deque<Token*> queue;
 
@@ -63,49 +63,49 @@ void Lexer::ReadLineToQueue() {
 }
 
 Token* Lexer::GetNextToken() {
-    while(code[codePointerInLine] == ' ' || code[codePointerInLine] == '\t') {
-        codePointerInLine++;
+    while(code[codePointerInCode] == ' ' || code[codePointerInCode] == '\t') {
+        codePointerInCode++;
     }
 
-    if(code[codePointerInLine] == '\n') {
+    if(code[codePointerInCode] == '\n') {
         lineno++;
-        codePointerInLine++;
+        codePointerInCode++;
 
         return new EOLToken(lineno-1, "");
     }
-    else if(std::regex_match(code.substr(codePointerInLine, 1), identifierRegex)) {
+    else if(std::regex_match(code.substr(codePointerInCode, 1), identifierRegex)) {
         int tokenLength = 1;
-        while(std::regex_match(code.substr(codePointerInLine, tokenLength), identifierRegex)) {
+        while(std::regex_match(code.substr(codePointerInCode, tokenLength), identifierRegex)) {
             tokenLength++;
         }
         tokenLength--;
 
-        int codePointer = codePointerInLine;
-        codePointerInLine += tokenLength;
+        int codePointer = codePointerInCode;
+        codePointerInCode += tokenLength;
         return new IdentifierToken(lineno, code.substr(codePointer, tokenLength));
     }
-    else if(std::regex_match(code.substr(codePointerInLine, 1), operatorRegex)) {
+    else if(std::regex_match(code.substr(codePointerInCode, 1), operatorRegex)) {
         int tokenLength = 1;
-        while(std::regex_match(code.substr(codePointerInLine, tokenLength), operatorRegex)) {
+        while(std::regex_match(code.substr(codePointerInCode, tokenLength), operatorRegex)) {
             tokenLength++;
         }
         tokenLength--;
 
-        int codePointer = codePointerInLine;
-        codePointerInLine += tokenLength;
+        int codePointer = codePointerInCode;
+        codePointerInCode += tokenLength;
         return new OperatorToken(lineno, code.substr(codePointer, tokenLength));
     }
-    else if(std::regex_match(code.substr(codePointerInLine, 1), numberRegex)) {
+    else if(std::regex_match(code.substr(codePointerInCode, 1), numberRegex)) {
         int tokenLength = 1;
-        while(std::regex_match(code.substr(codePointerInLine, tokenLength), numberRegex)) {
+        while(std::regex_match(code.substr(codePointerInCode, tokenLength), numberRegex)) {
             tokenLength++;
         }
         tokenLength--;
         
-        int codePointer = codePointerInLine;
-        codePointerInLine += tokenLength;
+        int codePointer = codePointerInCode;
+        codePointerInCode += tokenLength;
         return new NumberToken(lineno, code.substr(codePointer, tokenLength));
     }
 
-    throw std::runtime_error(ExpectedCharacter(code[codePointerInLine], lineno, codePointerInLine));
+    throw std::runtime_error(ExpectedCharacter(code[codePointerInCode], lineno, codePointerInCode));
 }

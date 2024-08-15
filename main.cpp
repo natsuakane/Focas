@@ -10,7 +10,7 @@
 int main(){
     std::cout << "Hello, Unchi!" << std::endl;
     
-    Lexer lexer("a32+200.5*100\n500\n");
+    Lexer lexer("a32+200.5*=\n500\n");
     std::cout << lexer.ReadToken()->GetValue() << std::endl;
     std::cout << lexer.ReadToken()->GetValue() << std::endl;
     std::cout << lexer.ReadToken()->GetValue() << std::endl;
