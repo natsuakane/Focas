@@ -31,11 +31,6 @@ public:
         doubleValue = v;
         this->lineno = lineno;
     }
-    Value(std::string v, int lineno) {
-        valueType = StringVal;
-        strValue = v;
-        this->lineno = lineno;
-    }
     Value(void* v, int lineno) {
         valueType = PtrVal;
         ptrValue = v;
@@ -43,35 +38,33 @@ public:
     }
 
     int GetInt() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Int", lineno));
+        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Int", ValueTypeNames[valueType], lineno));
         return intValue;
     }
     long GetLong() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Long", lineno));
+        if(valueType != LongNum) throw std::runtime_error(UnsuitableType("Long", ValueTypeNames[valueType], lineno));
         return longValue;
     }
     char GetChar() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Char", lineno));
+        if(valueType != CharNum) throw std::runtime_error(UnsuitableType("Char", ValueTypeNames[valueType], lineno));
         return charValue;
     }
     float GetFloat() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Float", lineno));
+        if(valueType != FloatNum) throw std::runtime_error(UnsuitableType("Float", ValueTypeNames[valueType], lineno));
         return floatValue;
     }
     double GetDouble() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Double", lineno));
+        if(valueType != DoubleNum) throw std::runtime_error(UnsuitableType("Double", ValueTypeNames[valueType], lineno));
         return doubleValue;
     }
-    std::string GetStr() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("String", lineno));
-        return strValue;
-    }
     void* GetPtr() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Pointer", lineno));
+        if(valueType != PtrVal) throw std::runtime_error(UnsuitableType("Pointer", ValueTypeNames[valueType], lineno));
         return ptrValue;
     }
 
-    ~Value() {}
+    ~Value() {
+        
+    }
 
 private:
     union {
@@ -80,7 +73,6 @@ private:
         char charValue;
         float floatValue;
         double doubleValue;
-        std::string strValue;
         void* ptrValue;
     };
 

@@ -3,23 +3,22 @@
 #include "AbstractSyntaxTree.h"
 #include "Value.h"
 
-class NumberAST : public AbstractSyntaxTree {
+class CharAST : public AbstractSyntaxTree {
 public:
-    NumberAST(long v, int lineno) {
-        //最適化処理の時にintに変換
+    CharAST(char v, int lineno) {
         this->value = new Value(v, lineno);
         this->lineno = lineno;
     }
 
     Value* Execute() {
-        return new Value(value->GetLong(), lineno);
+        return new Value(value->GetChar(), lineno);
     }
 
 private:
     Value* value;
     int lineno;
 
-    ~NumberAST() {
+    ~CharAST() {
 
     }
 
