@@ -62,8 +62,12 @@ public:
         return ptrValue;
     }
 
+    ValueType GetValueType() {
+        return valueType;
+    }
+
     ~Value() {
-        
+
     }
 
 private:

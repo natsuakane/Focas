@@ -10,9 +10,11 @@ public:
         this->lineno = lineno;
     }
 
+    /*
     Value* Execute() {
         return new Value(value->GetChar(), lineno);
     }
+    */
 
 private:
     Value* value;

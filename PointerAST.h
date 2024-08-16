@@ -11,9 +11,11 @@ public:
         this->lineno = lineno;
     }
 
+    /*
     Value* Execute() {
         return new Value(value->GetPtr(), lineno);
     }
+    */
 
 private:
     Value* value;

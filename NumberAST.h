@@ -7,7 +7,7 @@ class NumberAST : public AbstractSyntaxTree {
 public:
     NumberAST(long v, int lineno) {
         //最適化処理の時にintに変換
-        this->value = new Value(v, lineno);
+        this->value = new Value((long)v, lineno);
         this->lineno = lineno;
     }
 

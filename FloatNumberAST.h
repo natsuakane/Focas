@@ -10,10 +10,12 @@ public:
         this->value = new Value(v, lineno);
         this->lineno = lineno;
     }
-
+    
+    /*
     Value* Execute() {
         return new Value(value->GetDouble(), lineno);
     }
+    */
 
 private:
     Value* value;
