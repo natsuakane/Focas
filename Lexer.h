@@ -19,7 +19,7 @@ class Lexer {
 
             identifierRegex = std::regex("^[a-zA-Z_][a-zA-Z0-9_]*$");
             numberRegex = std::regex("^(\\-|\\+)?(0x|0b|0o)?[0-9]+(\\.[0-9]*)?$");
-            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)$");
+            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)|=|(\\*\\*)$");
         }
 
         Token* ReadToken();
@@ -47,6 +47,16 @@ Token* Lexer::ReadToken() {
 
     Token* token = queue.front();
     queue.pop_front();
+
+    return token;
+}
+
+Token* Lexer::PeakToken(int i) {
+    if(queue.size() == 0) {
+        ReadLineToQueue();
+    }
+
+    Token* token = queue[i];
 
     return token;
 }

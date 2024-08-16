@@ -16,7 +16,13 @@
 int main(){
     std::cout << "Hello, Unchi!" << std::endl;
     
-    Lexer lexer("a32+200.5*100\n500\n");
+    Lexer lexer("a32 + 200.5 ** 100\n500\n");
+    std::cout << lexer.PeakToken(0)->GetValue() << std::endl;
+    std::cout << lexer.PeakToken(1)->GetValue() << std::endl;
+    std::cout << lexer.PeakToken(2)->GetValue() << std::endl;
+    std::cout << lexer.PeakToken(3)->GetValue() << std::endl;
+    std::cout << lexer.PeakToken(4)->GetValue() << std::endl;
+    std::cout << lexer.PeakToken(5)->GetValue() << std::endl;
 
     std::cout << std::endl;
 

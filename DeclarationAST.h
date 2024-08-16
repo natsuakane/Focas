@@ -6,7 +6,8 @@
 
 class DeclarationAST : public AbstractSyntaxTree {
 public:
-    DeclarationAST(IdentifierAST* identifier, AbstractSyntaxTree* tree, int lineno) {
+    DeclarationAST(/*std::string type, */IdentifierAST* identifier, AbstractSyntaxTree* tree, int lineno) {
+        //this->type = type;
         this->identifier = identifier;
         this->tree = tree;
         this->lineno = lineno;
@@ -15,6 +16,7 @@ public:
     std::string OutputCode();
 
 private:
+    std::string type;
     IdentifierAST* identifier;
     AbstractSyntaxTree* tree;
     int lineno;
@@ -26,5 +28,5 @@ private:
 };
 
 std::string DeclarationAST::OutputCode() {
-    return "const var " + identifier->OutputCode() + " = " + tree->OutputCode();
+    return "const " + type + " " + identifier->OutputCode() + " = " + tree->OutputCode();
 }

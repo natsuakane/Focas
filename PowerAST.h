@@ -3,10 +3,9 @@
 #include "AbstractSyntaxTree.h"
 #include "Value.h"
 
-class MinusAST : public AbstractSyntaxTree {
+class PowerAST : public AbstractSyntaxTree {
 public:
-    MinusAST(AbstractSyntaxTree* tree1, AbstractSyntaxTree* tree2, int lineno) {
-        //最適化処理の時にintに変換
+    PowerAST(AbstractSyntaxTree* tree1, AbstractSyntaxTree* tree2, int lineno) {
         this->tree1 = tree1;
         this->tree2 = tree2;
         this->lineno = lineno;
@@ -19,12 +18,12 @@ private:
     AbstractSyntaxTree* tree2;
     int lineno;
 
-    ~MinusAST() {
+    ~PowerAST() {
 
     }
 
 };
 
-std::string MinusAST::OutputCode() {
-    return tree1->OutputCode() + " - " + tree2->OutputCode();
+std::string PowerAST::OutputCode() {
+    return "pow(" + tree1->OutputCode() + ", " + tree2->OutputCode() + ")";
 }
