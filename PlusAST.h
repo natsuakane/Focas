@@ -14,43 +14,6 @@ public:
 
     std::string OutputCode();
 
-    /*
-    Value* Execute() {
-        Value* value1 = tree1->Execute();
-        Value* value2 = tree2->Execute();
-
-        if(value1->GetValueType() == IntNum && value2->GetValueType() == IntNum) {
-            return new Value(value1->GetInt() + value2->GetInt(), lineno);
-        }
-        else if(value1->GetValueType() == IntNum && value2->GetValueType() == LongNum) {
-            return new Value(value1->GetInt() + value2->GetLong(), lineno);
-        }
-        else if(value1->GetValueType() == LongNum && value2->GetValueType() == IntNum) {
-            return new Value(value1->GetLong() + value2->GetInt(), lineno);
-        }
-        else if(value1->GetValueType() == LongNum && value2->GetValueType() == LongNum) {
-            return new Value(value1->GetLong() + value2->GetLong(), lineno);
-        }
-
-        else if(value1->GetValueType() == FloatNum && value2->GetValueType() == FloatNum) {
-            return new Value(value1->GetFloat() + value2->GetFloat(), lineno);
-        }
-        else if(value1->GetValueType() == FloatNum && value2->GetValueType() == DoubleNum) {
-            return new Value(value1->GetFloat() + value2->GetDouble(), lineno);
-        }
-        else if(value1->GetValueType() == DoubleNum && value2->GetValueType() == FloatNum) {
-            return new Value(value1->GetDouble() + value2->GetFloat(), lineno);
-        }
-        else if(value1->GetValueType() == DoubleNum && value2->GetValueType() == DoubleNum) {
-            return new Value(value1->GetDouble() + value2->GetDouble(), lineno);
-        }
-
-        else {
-            throw std::runtime_error(UnsuitableTypeWithOperator("+", ValueTypeNames[value1->GetValueType()], lineno));
-        }
-    }
-    */
-
 private:
     AbstractSyntaxTree* tree1;
     AbstractSyntaxTree* tree2;
@@ -61,3 +24,7 @@ private:
     }
 
 };
+
+std::string PlusAST::OutputCode() {
+    return "(" + tree1->OutputCode() + " + " + tree2->OutputCode() + ")";
+}

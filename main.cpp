@@ -7,6 +7,7 @@
 #include "NumberAST.h"
 #include "FloatNumberAST.h"
 #include "PlusAST.h"
+#include "MultiplicationAST.h"
 #include <iostream>
 #include <regex>
 
@@ -25,10 +26,11 @@ int main(){
 
     std::cout << std::endl;
 
-    FloatNumberAST* number1 = new FloatNumberAST(100, 0);
-    FloatNumberAST* number2 = new FloatNumberAST(100, 0);
-    PlusAST* plus = new PlusAST(number1, number2, 0);
-    std::cout << plus->Execute()->GetDouble() << std::endl;
+    NumberAST* number1 = new NumberAST(100, 0);
+    FloatNumberAST* number2 = new FloatNumberAST(100.5, 0);
+    NumberAST* number3 = new NumberAST(5, 0);
+    PlusAST* plus = new PlusAST(number1, new MultiplicationAST(number2, number3, 0), 0);
+    std::cout << plus->OutputCode() << std::endl;
 
     return 0;
 }

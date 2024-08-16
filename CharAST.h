@@ -10,11 +10,7 @@ public:
         this->lineno = lineno;
     }
 
-    /*
-    Value* Execute() {
-        return new Value(value->GetChar(), lineno);
-    }
-    */
+    std::string OutputCode();
 
 private:
     Value* value;
@@ -25,3 +21,7 @@ private:
     }
 
 };
+
+std::string CharAST::OutputCode() {
+    return "\'" + std::to_string(value->GetChar()) + "\'";
+}

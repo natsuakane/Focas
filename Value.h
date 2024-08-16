@@ -6,13 +6,8 @@
 
 struct Value {
 public:
-    Value(int v, int lineno) {
-        valueType = IntNum;
-        intValue = v;
-        this->lineno = lineno;
-    }
     Value(long v, int lineno) {
-        valueType = LongNum;
+        valueType = Integer;
         longValue = v;
         this->lineno = lineno;
     }
@@ -21,13 +16,8 @@ public:
         charValue = v;
         this->lineno = lineno;
     }
-    Value(float v, int lineno) {
-        valueType = FloatNum;
-        floatValue = v;
-        this->lineno = lineno;
-    }
     Value(double v, int lineno) {
-        valueType = DoubleNum;
+        valueType = Float;
         doubleValue = v;
         this->lineno = lineno;
     }
@@ -37,24 +27,16 @@ public:
         this->lineno = lineno;
     }
 
-    int GetInt() {
-        if(valueType != IntNum) throw std::runtime_error(UnsuitableType("Int", ValueTypeNames[valueType], lineno));
-        return intValue;
-    }
     long GetLong() {
-        if(valueType != LongNum) throw std::runtime_error(UnsuitableType("Long", ValueTypeNames[valueType], lineno));
+        if(valueType != Integer) throw std::runtime_error(UnsuitableType("Integer", ValueTypeNames[valueType], lineno));
         return longValue;
     }
     char GetChar() {
         if(valueType != CharNum) throw std::runtime_error(UnsuitableType("Char", ValueTypeNames[valueType], lineno));
         return charValue;
     }
-    float GetFloat() {
-        if(valueType != FloatNum) throw std::runtime_error(UnsuitableType("Float", ValueTypeNames[valueType], lineno));
-        return floatValue;
-    }
     double GetDouble() {
-        if(valueType != DoubleNum) throw std::runtime_error(UnsuitableType("Double", ValueTypeNames[valueType], lineno));
+        if(valueType != Float) throw std::runtime_error(UnsuitableType("Float", ValueTypeNames[valueType], lineno));
         return doubleValue;
     }
     void* GetPtr() {
@@ -72,10 +54,8 @@ public:
 
 private:
     union {
-        int intValue;
         long longValue;
         char charValue;
-        float floatValue;
         double doubleValue;
         void* ptrValue;
     };

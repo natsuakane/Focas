@@ -6,7 +6,6 @@
 class AbstractSyntaxTree {
 public:
     virtual std::string OutputCode() = 0;
-    //virtual Value* Execute() = 0;
     virtual ~AbstractSyntaxTree() {};
 
 private:

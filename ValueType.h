@@ -1,11 +1,9 @@
 #include <string>
 
 enum ValueType {
-    IntNum,
-    LongNum,
+    Integer,
     CharNum, 
-    FloatNum,
-    DoubleNum,
+    Float,
     PtrVal,
 };
 

@@ -10,12 +10,8 @@ public:
         this->value = new Value(v, lineno);
         this->lineno = lineno;
     }
-    
-    /*
-    Value* Execute() {
-        return new Value(value->GetDouble(), lineno);
-    }
-    */
+
+    std::string OutputCode();
 
 private:
     Value* value;
@@ -26,3 +22,7 @@ private:
     }
 
 };
+
+std::string FloatNumberAST::OutputCode() {
+    return std::to_string(value->GetDouble());
+}

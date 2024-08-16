@@ -6,14 +6,11 @@
 class NumberAST : public AbstractSyntaxTree {
 public:
     NumberAST(long v, int lineno) {
-        //最適化処理の時にintに変換
         this->value = new Value((long)v, lineno);
         this->lineno = lineno;
     }
 
-    Value* Execute() {
-        return new Value(value->GetLong(), lineno);
-    }
+    std::string OutputCode();
 
 private:
     Value* value;
@@ -24,3 +21,7 @@ private:
     }
 
 };
+
+std::string NumberAST::OutputCode() {
+    return std::to_string(value->GetLong());
+}
