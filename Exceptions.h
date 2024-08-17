@@ -20,3 +20,7 @@ std::string UnsuitableTypeWithOperator(std::string op, std::string argmentType, 
             "\" cannot be executed by the operator \"" + op + "\". " + 
             std::to_string(lineno);
 }
+
+std::string UnexpectedToken(std::string token, int lineno) {
+    return "Error: The token \"" + token + "\" is unexpected token." + std::to_string(lineno);
+}

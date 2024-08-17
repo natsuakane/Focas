@@ -6,8 +6,8 @@
 
 class DeclarationAST : public AbstractSyntaxTree {
 public:
-    DeclarationAST(/*std::string type, */IdentifierAST* identifier, AbstractSyntaxTree* tree, int lineno) {
-        //this->type = type;
+    DeclarationAST(std::string type, IdentifierAST* identifier, AbstractSyntaxTree* tree, int lineno) {
+        this->type = type;
         this->identifier = identifier;
         this->tree = tree;
         this->lineno = lineno;
