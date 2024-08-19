@@ -7,7 +7,7 @@
 class AbstractSyntaxTree {
 public:
     virtual std::string OutputCode() = 0;
-    virtual AbstractSyntaxTree* GetChild(int i);
+    virtual AbstractSyntaxTree* GetChild(int i) = 0;
     virtual ~AbstractSyntaxTree() {};
 
 private:

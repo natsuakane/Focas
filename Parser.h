@@ -124,17 +124,17 @@ AbstractSyntaxTree* Parser::MultiplicationExpression() {
 
     if(IsToken("*")) {
         IsExpectedTokne("*");
-        AbstractSyntaxTree* left = PowerExpression();
+        AbstractSyntaxTree* left = MultiplicationExpression();
         return new MultiplicationAST(right, left, GetNowLineno());
     }
     else if(IsToken("/")) {
         IsExpectedTokne("/");
-        AbstractSyntaxTree* left = PowerExpression();
+        AbstractSyntaxTree* left = MultiplicationExpression();
         return new DivisionAST(right, left, GetNowLineno());
     }
     else if(IsToken("%")) {
         IsExpectedTokne("%");
-        AbstractSyntaxTree* left = PowerExpression();
+        AbstractSyntaxTree* left = MultiplicationExpression();
         return new ModAST(right, left, GetNowLineno());
     }
 
