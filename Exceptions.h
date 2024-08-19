@@ -24,3 +24,12 @@ std::string UnsuitableTypeWithOperator(std::string op, std::string argmentType, 
 std::string UnexpectedToken(std::string token, int lineno) {
     return "Error: The token \"" + token + "\" is unexpected token." + std::to_string(lineno);
 }
+
+std::string TypeHasNoChildren(std::string type, int lineno) {
+    return "Error: The type \"" + type + "\" has no children. " + std::to_string(lineno);
+}
+
+std::string TypeHasNoChildrenMoreThan(std::string type, int n, int lineno) {
+    return "Error: The type \"" + type + "\" has no children more than " + std::to_string(n)
+            + ". " + std::to_string(lineno);
+}

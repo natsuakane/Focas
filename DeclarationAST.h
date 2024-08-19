@@ -13,6 +13,13 @@ public:
         this->lineno = lineno;
     }
 
+    AbstractSyntaxTree* GetChild(int i) {
+        if(i == 0) return identifier;
+        if(i == 1) return tree;
+
+        throw std::runtime_error(TypeHasNoChildrenMoreThan("DeclarationAST", 2, lineno));
+    }
+
     std::string OutputCode();
 
 private:

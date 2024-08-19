@@ -48,6 +48,37 @@ private:
     AbstractSyntaxTree* PlusExpression();
     AbstractSyntaxTree* DeclarationExpression();
 
+    AbstractSyntaxTree* GetHalfwayMultiplicationExp() {
+        AbstractSyntaxTree* right = Factor();
+        if(IsToken("*")) {
+            IsExpectedTokne("*");
+        }
+        else if(IsToken("/")) {
+            IsExpectedTokne("/");
+        }
+        else if(IsToken("%")) {
+            IsExpectedTokne("%");
+        }
+
+        throw std::runtime_error(UnexpectedToken(lexer->PeakToken(0)->GetValue(), GetNowLineno()));
+    }
+
+    AbstractSyntaxTree* GetHalfWayPlusExp() {
+        AbstractSyntaxTree* right = Factor();
+        if(IsToken("+")) {
+            IsExpectedTokne("+");
+            AbstractSyntaxTree* left = Factor();
+            return new PlusAST(right, left, GetNowLineno());
+        }
+        else if(IsToken("-")) {
+            IsExpectedTokne("-");
+            AbstractSyntaxTree* left = Factor();
+            return new MinusAST(right, left, GetNowLineno());
+        }
+        
+        throw std::runtime_error(UnexpectedToken(lexer->PeakToken(0)->GetValue(), GetNowLineno()));
+    }
+
 };
 
 AbstractSyntaxTree* Parser::GetTree() {
@@ -81,7 +112,7 @@ AbstractSyntaxTree* Parser::PowerExpression() {
     
     if(IsToken("**")) {
         IsExpectedTokne("**");
-        AbstractSyntaxTree* left = Factor();
+        AbstractSyntaxTree* left = PowerExpression();
         return new PowerAST(right, left, GetNowLineno());
     }
 

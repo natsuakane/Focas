@@ -27,11 +27,22 @@ class Lexer {
         Token* ReadToken();
         Token* PeakToken(int n);
 
+        void SaveQueue() {
+            saveQueue.resize(queue.size());
+            std::copy(queue.begin(), queue.end(), saveQueue.begin());
+        }
+
+        void UndoQueue() {
+            queue.resize(saveQueue.size());
+            std::copy(saveQueue.begin(), saveQueue.end(), queue.begin());
+        }
+
     private:
         std::string code;
         int codePointerInCode;
         int lineno;
         std::deque<Token*> queue;
+        std::deque<Token*> saveQueue;
 
         std::regex identifierRegex;
         std::regex numberRegex;

@@ -11,6 +11,13 @@ public:
         this->lineno = lineno;
     }
 
+    AbstractSyntaxTree* GetChild(int i) {
+        if(i == 0) return tree1;
+        if(i == 1) return tree2;
+
+        throw std::runtime_error(TypeHasNoChildrenMoreThan("PowerAST", 2, lineno));
+    }
+
     std::string OutputCode();
 
 private:

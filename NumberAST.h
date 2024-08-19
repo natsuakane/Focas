@@ -10,6 +10,10 @@ public:
         this->lineno = lineno;
     }
 
+    AbstractSyntaxTree* GetChild(int i) {
+        throw std::runtime_error(TypeHasNoChildren("Number", lineno));
+    }
+
     std::string OutputCode();
 
 private:
