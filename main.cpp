@@ -17,7 +17,7 @@
 int main(){
     std::cout << "Hello, Unchi!" << std::endl;
     
-    Lexer lexer("a32 * 200.5 * 100\n");
+    Lexer lexer("3 + a32 * 200.5 * 7 + 7\n");
 
     Parser parser(&lexer);
     std::cout << parser.GetTree()->OutputCode() << std::endl;

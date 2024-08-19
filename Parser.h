@@ -125,16 +125,52 @@ AbstractSyntaxTree* Parser::MultiplicationExpression() {
     if(IsToken("*")) {
         IsExpectedTokne("*");
         AbstractSyntaxTree* left = MultiplicationExpression();
+        
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new MultiplicationAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
         return new MultiplicationAST(right, left, GetNowLineno());
     }
     else if(IsToken("/")) {
         IsExpectedTokne("/");
         AbstractSyntaxTree* left = MultiplicationExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new DivisionAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::string error) {
+
+        }
+
         return new DivisionAST(right, left, GetNowLineno());
     }
     else if(IsToken("%")) {
         IsExpectedTokne("%");
         AbstractSyntaxTree* left = MultiplicationExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new ModAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error) {
+
+        }
+
         return new ModAST(right, left, GetNowLineno());
     }
 
@@ -146,12 +182,36 @@ AbstractSyntaxTree* Parser::PlusExpression() {
 
     if(IsToken("+")) {
         IsExpectedTokne("+");
-        AbstractSyntaxTree* left = MultiplicationExpression();
+        AbstractSyntaxTree* left = PlusExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new PlusAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
         return new PlusAST(right, left, GetNowLineno());
     }
     else if(IsToken("-")) {
         IsExpectedTokne("-");
         AbstractSyntaxTree* left = MultiplicationExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new PlusAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+        
         return new MinusAST(right, left, GetNowLineno());
     }
 
