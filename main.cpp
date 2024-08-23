@@ -15,12 +15,11 @@
 #include <regex>
 
 int main(){
-    std::cout << "Hello, Unchi!" << std::endl;
-    
-    Lexer lexer("3 + a32 * 200.5 * 7 + 7\n");
+    Lexer lexer("let a : int = 3 + 7\n");
 
     Parser parser(&lexer);
-    std::cout << parser.GetTree()->OutputCode() << std::endl;
+    AbstractSyntaxTree* code = parser.GetTree();
+    std::cout << code->OutputCode() << std::endl;
 
     return 0;
 }

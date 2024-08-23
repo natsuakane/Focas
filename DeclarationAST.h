@@ -35,5 +35,5 @@ private:
 };
 
 std::string DeclarationAST::OutputCode() {
-    return "const " + type + " " + identifier->OutputCode() + " = " + tree->OutputCode();
+    return type + " const " + identifier->OutputCode() + " = " + tree->OutputCode();
 }

@@ -16,6 +16,7 @@
 #include "PlusAST.h"
 #include "PowerAST.h"
 #include "ModAST.h"
+#include "CodeAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -35,9 +36,11 @@ private:
             throw std::runtime_error(UnexpectedToken(token->GetValue(), token->GetLineNo()));
         }
     }
+
     bool IsToken(std::string val) {
         return val == lexer->PeakToken(0)->GetValue();
     }
+    
     int GetNowLineno() {
         return lexer->PeakToken(0)->GetLineNo();
     }
@@ -47,42 +50,12 @@ private:
     AbstractSyntaxTree* MultiplicationExpression();
     AbstractSyntaxTree* PlusExpression();
     AbstractSyntaxTree* DeclarationExpression();
-
-    AbstractSyntaxTree* GetHalfwayMultiplicationExp() {
-        AbstractSyntaxTree* right = Factor();
-        if(IsToken("*")) {
-            IsExpectedTokne("*");
-        }
-        else if(IsToken("/")) {
-            IsExpectedTokne("/");
-        }
-        else if(IsToken("%")) {
-            IsExpectedTokne("%");
-        }
-
-        throw std::runtime_error(UnexpectedToken(lexer->PeakToken(0)->GetValue(), GetNowLineno()));
-    }
-
-    AbstractSyntaxTree* GetHalfWayPlusExp() {
-        AbstractSyntaxTree* right = Factor();
-        if(IsToken("+")) {
-            IsExpectedTokne("+");
-            AbstractSyntaxTree* left = Factor();
-            return new PlusAST(right, left, GetNowLineno());
-        }
-        else if(IsToken("-")) {
-            IsExpectedTokne("-");
-            AbstractSyntaxTree* left = Factor();
-            return new MinusAST(right, left, GetNowLineno());
-        }
-        
-        throw std::runtime_error(UnexpectedToken(lexer->PeakToken(0)->GetValue(), GetNowLineno()));
-    }
+    AbstractSyntaxTree* Code();
 
 };
 
 AbstractSyntaxTree* Parser::GetTree() {
-    return DeclarationExpression();
+    return Code();
 }
 
 AbstractSyntaxTree* Parser::Factor() {
@@ -150,7 +123,7 @@ AbstractSyntaxTree* Parser::MultiplicationExpression() {
             right = new DivisionAST(right, rightOfLeft, GetNowLineno());
             left = leftOfLeft;
         }
-        catch(std::string error) {
+        catch(std::runtime_error error) {
 
         }
 
@@ -211,7 +184,7 @@ AbstractSyntaxTree* Parser::PlusExpression() {
         catch(std::runtime_error error) {
 
         }
-        
+
         return new MinusAST(right, left, GetNowLineno());
     }
 
@@ -242,4 +215,17 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
     }
 
     return new DeclarationAST(typeName, identifier, value, GetNowLineno());
+}
+
+AbstractSyntaxTree* Parser::Code() {
+    std::vector<AbstractSyntaxTree*> expressions;
+    while(!IsToken("EOF")) {
+        expressions.push_back(DeclarationExpression());
+
+        while(IsToken("EOL")) {
+            IsExpectedTokne("EOL");
+        }
+    }
+
+    return new CodeAST(expressions, GetNowLineno());
 }

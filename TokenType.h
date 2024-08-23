@@ -5,4 +5,5 @@ enum TokenType{
     Operator, 
     Identifier, 
     EOL, 
+    EndOfFile,
 };

@@ -9,6 +9,7 @@
 #include "NumberToken.h"
 #include "OperatorToken.h"
 #include "EOLToken.h"
+#include "EOFToken.h"
 #include "TokenType.h"
 #include "Exceptions.h"
 
@@ -21,7 +22,7 @@ class Lexer {
 
             identifierRegex = std::regex("^[a-zA-Z_][a-zA-Z0-9_]*$");
             numberRegex = std::regex("^(\\-|\\+)?(0x|0b|0o)?[0-9]+(\\.[0-9]*)?$");
-            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)|=|(\\*\\*)$");
+            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)|=|:|(\\*\\*)$");
         }
 
         Token* ReadToken();
@@ -32,7 +33,7 @@ class Lexer {
             std::copy(queue.begin(), queue.end(), saveQueue.begin());
         }
 
-        void UndoQueue() {
+        void LoadQueue() {
             queue.resize(saveQueue.size());
             std::copy(saveQueue.begin(), saveQueue.end(), queue.begin());
         }
@@ -76,6 +77,10 @@ Token* Lexer::PeakToken(int i) {
 
 void Lexer::ReadLineToQueue() {
     Token* token = GetNextToken();
+    if(token->GetType() == EndOfFile) {
+        queue.push_back(token);
+        return;
+    }
 
     while(token->GetType() != EOL) {
         queue.push_back(token);
@@ -86,6 +91,10 @@ void Lexer::ReadLineToQueue() {
 }
 
 Token* Lexer::GetNextToken() {
+    if(codePointerInCode >= code.length()) {
+        return new EOFToken(lineno, "");
+    }
+
     while(code[codePointerInCode] == ' ' || code[codePointerInCode] == '\t') {
         codePointerInCode++;
     }

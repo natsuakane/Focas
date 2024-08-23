@@ -1,21 +1,20 @@
 #pragma once
 
-#include <string>
 #include "Token.h"
 #include "TokenType.h"
 
-class EOLToken : public Token {
+class EOFToken : public Token {
     public:
-        EOLToken(int lineno, std::string value) : Token(lineno, value) {
+        EOFToken(int lineno, std::string value) : Token(lineno, value) {
             this->lineno = lineno;
         }
 
         TokenType GetType() {
-            return EOL;
+            return EndOfFile;
         }
 
         std::string GetValue() {
-            return std::string("EOL");
+            return "EOF";
         }
 
         int GetLineNo() {
@@ -25,7 +24,7 @@ class EOLToken : public Token {
     private:
         int lineno;
 
-        ~EOLToken() {
+        ~EOFToken() {
 
         }
 };

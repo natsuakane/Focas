@@ -4,7 +4,7 @@
 
 std::string ExpectedCharacter(char expected, int lineno, int codePointerInCode) {
     return "Error: The character \"" + std::string(1, expected) + 
-            "\" is undefined token." + 
+            "\" is undefined token. " + 
             std::to_string(lineno) + ":" + std::to_string(codePointerInCode);
 }
 
@@ -22,7 +22,7 @@ std::string UnsuitableTypeWithOperator(std::string op, std::string argmentType, 
 }
 
 std::string UnexpectedToken(std::string token, int lineno) {
-    return "Error: The token \"" + token + "\" is unexpected token." + std::to_string(lineno);
+    return "Error: The token \"" + token + "\" is unexpected token. " + std::to_string(lineno);
 }
 
 std::string TypeHasNoChildren(std::string type, int lineno) {
