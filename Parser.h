@@ -1,3 +1,4 @@
+#include <typeinfo>
 #include "Lexer.h"
 #include "Token.h"
 #include "EOLToken.h"
@@ -6,6 +7,7 @@
 #include "OperatorToken.h"
 #include "AbstractSyntaxTree.h"
 #include "CharAST.h"
+#include "ConstantAST.h"
 #include "DeclarationAST.h"
 #include "DivisionAST.h"
 #include "FloatNumberAST.h"
@@ -17,6 +19,7 @@
 #include "PowerAST.h"
 #include "ModAST.h"
 #include "CodeAST.h"
+#include "AssignmentAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -49,6 +52,7 @@ private:
     AbstractSyntaxTree* PowerExpression();
     AbstractSyntaxTree* MultiplicationExpression();
     AbstractSyntaxTree* PlusExpression();
+    AbstractSyntaxTree* AssignmentExpression();
     AbstractSyntaxTree* DeclarationExpression();
     AbstractSyntaxTree* Code();
 
@@ -75,6 +79,9 @@ AbstractSyntaxTree* Parser::Factor() {
     }
     else if(lexer->PeakToken(0)->GetType() == Identifier) {
         return new IdentifierAST(lexer->ReadToken()->GetValue(), GetNowLineno());
+    }
+    else if(lexer->PeakToken(0)->GetType() == String) {
+        return new StringAST(lexer->ReadToken()->GetValue(), GetNowLineno());
     }
 
     throw std::runtime_error(UnexpectedToken(lexer->PeakToken(0)->GetValue(), GetNowLineno()));
@@ -191,30 +198,65 @@ AbstractSyntaxTree* Parser::PlusExpression() {
     return right;
 }
 
+AbstractSyntaxTree* Parser::AssignmentExpression() {
+    AbstractSyntaxTree* right = PlusExpression();
+
+    if(IsToken("=")) {
+        IsExpectedTokne("=");
+
+        AbstractSyntaxTree* left = AssignmentExpression();
+
+        return new AssignmentAST(right, left, GetNowLineno());
+    }
+
+    return right;
+}
+
 AbstractSyntaxTree* Parser::DeclarationExpression() {
-    if(!IsToken("let")) {
-        return PlusExpression();
+    if(IsToken("let")) {
+        IsExpectedTokne("let");
+
+        std::string typeName;
+        std::string varName = lexer->ReadToken()->GetValue();
+        IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
+
+        if(IsToken(":")){
+            IsExpectedTokne(":");
+            typeName = lexer->ReadToken()->GetValue();
+        }
+
+        IsExpectedTokne("=");
+        AbstractSyntaxTree* value = PlusExpression();
+
+        if(typeName == "") {
+            typeName = "Error";
+        }
+
+        return new DeclarationAST(typeName, identifier, value, GetNowLineno());
+    }
+    else if(IsToken("const")) {
+        IsExpectedTokne("const");
+
+        std::string typeName;
+        std::string varName = lexer->ReadToken()->GetValue();
+        IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
+
+        if(IsToken(":")){
+            IsExpectedTokne(":");
+            typeName = lexer->ReadToken()->GetValue();
+        }
+
+        IsExpectedTokne("=");
+        AbstractSyntaxTree* value = PlusExpression();
+
+        if(typeName == "") { 
+            typeName = "Error";
+        }
+
+        return new ConstantAST(typeName, identifier, value, GetNowLineno());
     }
 
-    IsExpectedTokne("let");
-
-    std::string typeName;
-    std::string varName = lexer->ReadToken()->GetValue();
-    IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
-
-    if(IsToken(":")){
-        IsExpectedTokne(":");
-        typeName = lexer->ReadToken()->GetValue();
-    }
-
-    IsExpectedTokne("=");
-    AbstractSyntaxTree* value = PlusExpression();
-
-    if(typeName == "") {
-        typeName = "Error";
-    }
-
-    return new DeclarationAST(typeName, identifier, value, GetNowLineno());
+    return AssignmentExpression();
 }
 
 AbstractSyntaxTree* Parser::Code() {

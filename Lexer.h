@@ -8,6 +8,7 @@
 #include "IdentifierToken.h"
 #include "NumberToken.h"
 #include "OperatorToken.h"
+#include "StringToken.h"
 #include "EOLToken.h"
 #include "EOFToken.h"
 #include "TokenType.h"
@@ -22,7 +23,9 @@ class Lexer {
 
             identifierRegex = std::regex("^[a-zA-Z_][a-zA-Z0-9_]*$");
             numberRegex = std::regex("^(\\-|\\+)?(0x|0b|0o)?[0-9]+(\\.[0-9]*)?$");
-            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)|=|:|(\\*\\*)$");
+            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)|=|:|\\.|(\\*\\*)$");
+            stringRegex = std::regex("^[^\"]*$");
+            frontOfStringRegex = std::regex("^\"$");
         }
 
         Token* ReadToken();
@@ -48,6 +51,8 @@ class Lexer {
         std::regex identifierRegex;
         std::regex numberRegex;
         std::regex operatorRegex;
+        std::regex stringRegex;
+        std::regex frontOfStringRegex;
 
         void ReadLineToQueue();
         Token* GetNextToken();
@@ -137,6 +142,18 @@ Token* Lexer::GetNextToken() {
         int codePointer = codePointerInCode;
         codePointerInCode += tokenLength;
         return new NumberToken(lineno, code.substr(codePointer, tokenLength));
+    }
+    else if(std::regex_match(code.substr(codePointerInCode, 1), frontOfStringRegex)) {
+        int tokenLength = 1;
+        codePointerInCode++;
+        while(std::regex_match(code.substr(codePointerInCode, tokenLength), stringRegex)) {
+            tokenLength++;
+        }
+        tokenLength--;
+        
+        int codePointer = codePointerInCode;
+        codePointerInCode += tokenLength + 1;
+        return new StringToken(lineno, code.substr(codePointer, tokenLength));
     }
 
     throw std::runtime_error(ExpectedCharacter(code[codePointerInCode], lineno, codePointerInCode));

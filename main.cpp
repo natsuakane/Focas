@@ -9,13 +9,14 @@
 #include "PlusAST.h"
 #include "MultiplicationAST.h"
 #include "IdentifierAST.h"
-#include "DeclarationAST.h"
+#include "ConstantAST.h"
+#include "StringAST.h"
 #include "Parser.h"
 #include <iostream>
 #include <regex>
 
 int main(){
-    Lexer lexer("let a : int = 3 + 7\n");
+    Lexer lexer("a = \"aaa\" + 7\n");
 
     Parser parser(&lexer);
     AbstractSyntaxTree* code = parser.GetTree();

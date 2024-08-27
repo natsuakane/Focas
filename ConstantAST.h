@@ -4,9 +4,9 @@
 #include "Value.h"
 #include "IdentifierAST.h"
 
-class DeclarationAST : public AbstractSyntaxTree {
+class ConstantAST : public AbstractSyntaxTree {
 public:
-    DeclarationAST(std::string type, IdentifierAST* identifier, AbstractSyntaxTree* tree, int lineno) {
+    ConstantAST(std::string type, IdentifierAST* identifier, AbstractSyntaxTree* tree, int lineno) {
         this->type = type; //型推論を実装
         this->identifier = identifier;
         this->tree = tree;
@@ -17,7 +17,7 @@ public:
         if(i == 0) return identifier;
         if(i == 1) return tree;
 
-        throw std::runtime_error(TypeHasNoChildrenMoreThan("DeclarationAST", 2, lineno));
+        throw std::runtime_error(TypeHasNoChildrenMoreThan("ConstantAST", 2, lineno));
     }
 
     std::string OutputCode();
@@ -28,12 +28,12 @@ private:
     AbstractSyntaxTree* tree;
     int lineno;
 
-    ~DeclarationAST() {
+    ~ConstantAST() {
 
     }
 
 };
 
-std::string DeclarationAST::OutputCode() {
-    return type + " " + identifier->OutputCode() + " = " + tree->OutputCode();
+std::string ConstantAST::OutputCode() {
+    return "const " + type + " " + identifier->OutputCode() + " = " + tree->OutputCode();
 }

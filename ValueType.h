@@ -4,6 +4,7 @@ enum ValueType {
     Integer,
     CharNum, 
     Float,
+    StrVal, 
     PtrVal,
 };
 
