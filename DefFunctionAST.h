@@ -8,7 +8,7 @@
 
 class DefFunctionAST : public AbstractSyntaxTree {
 public:
-    DefFunctionAST(std::string returnType, IdentifierAST* identifier, std::vector<ArgmentAST> argments, AbstractSyntaxTree* tree, int lineno) {
+    DefFunctionAST(std::string returnType, IdentifierAST* identifier, std::vector<ArgmentAST*> argments, AbstractSyntaxTree* tree, int lineno) {
         this->returnType = returnType; //型推論を実装
         this->argments.resize(argments.size());
         std::copy(argments.begin(), argments.end(), this->argments.begin());
@@ -41,9 +41,11 @@ private:
 
 std::string DefFunctionAST::OutputCode() {
     std::string code = returnType + " " + identifier->OutputCode() + "(";
-    for(ArgmentAST* argment : argments) {
-        code += argment->OutputCode() + ",";
+    for(int i = 0; i < argments.size(); i++) {
+        code += argments[i]->OutputCode() + ",";
     }
-    code += ")" + tree->OutputCode();
+    code = code.substr(0, code.size() - 1);
+    code += ") {\n" + tree->OutputCode() + "}";
+
     return code;
 }

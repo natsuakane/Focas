@@ -16,7 +16,7 @@
 #include <regex>
 
 int main(){
-    Lexer lexer("a = \"aaa\" + 7\n");
+    Lexer lexer("func f(a : int, b : string) : int => \nlet a : int = 1+1 end\nf(1, 2)\n");
 
     Parser parser(&lexer);
     AbstractSyntaxTree* code = parser.GetTree();
