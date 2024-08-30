@@ -18,7 +18,7 @@ public:
     AbstractSyntaxTree* GetChild(int i) {
         return argments[i];
 
-        throw std::runtime_error(TypeHasNoChildrenMoreThan("DefFunctionAST", 1, lineno));
+        throw std::runtime_error(TypeHasNoChildrenMoreThan("CallFunctionAST", 1, lineno));
     }
 
     std::string OutputCode();

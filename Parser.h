@@ -25,6 +25,7 @@
 #include "ArgmentAST.h"
 #include "ClassAST.h"
 #include "AccessModifier.h"
+#include "MakeObjectAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -106,6 +107,27 @@ AbstractSyntaxTree* Parser::Factor() {
             IsExpectedToken(")");
 
             return new CallFunctionAST(identifier, argments, GetNowLineno());
+        }
+        else if(lexer->PeakToken(0)->GetValue() == "new") {
+            IsExpectedToken("new");
+
+            std::string name = lexer->ReadToken()->GetValue();
+            IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
+            std::vector<AbstractSyntaxTree*> argments;
+
+            IsExpectedToken("(");
+            while(true) {
+                argments.push_back(AssignmentExpression());
+                
+                if(lexer->PeakToken(0)->GetValue() == ")") {
+                    break;
+                }
+
+                IsExpectedToken(",");
+            }
+            IsExpectedToken(")");
+
+            return new MakeObjectAST(identifier, argments, GetNowLineno());
         }
         return new IdentifierAST(lexer->ReadToken()->GetValue(), GetNowLineno());
     }
