@@ -23,6 +23,8 @@
 #include "DefFunctionAST.h"
 #include "CallFunctionAST.h"
 #include "ArgmentAST.h"
+#include "ClassAST.h"
+#include "AccessModifier.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -49,12 +51,6 @@ private:
         }
         return val == lexer->PeakToken(0)->GetValue();
     }
-
-    void MaybeNewLine() {
-        if(IsToken("EOL")) {
-            IsExpectedToken("EOL");
-        }
-    }
     
     int GetNowLineno() {
         return lexer->PeakToken(0)->GetLineNo();
@@ -66,6 +62,7 @@ private:
     AbstractSyntaxTree* PlusExpression();
     AbstractSyntaxTree* AssignmentExpression();
     AbstractSyntaxTree* DeclarationExpression();
+    AbstractSyntaxTree* ClassExpression();
     AbstractSyntaxTree* Code();
 
 };
@@ -252,17 +249,11 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         std::string varName = lexer->ReadToken()->GetValue();
         IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
 
-        if(IsToken(":")){
-            IsExpectedToken(":");
-            typeName = lexer->ReadToken()->GetValue();
-        }
+        IsExpectedToken(":");
+        typeName = lexer->ReadToken()->GetValue();
 
         IsExpectedToken("=");
         AbstractSyntaxTree* value = PlusExpression();
-
-        if(typeName == "") {
-            typeName = "Error";
-        }
 
         return new DeclarationAST(typeName, identifier, value, GetNowLineno());
     }
@@ -273,17 +264,11 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         std::string varName = lexer->ReadToken()->GetValue();
         IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
 
-        if(IsToken(":")){
             IsExpectedToken(":");
             typeName = lexer->ReadToken()->GetValue();
-        }
 
         IsExpectedToken("=");
         AbstractSyntaxTree* value = PlusExpression();
-
-        if(typeName == "") { 
-            typeName = "Error";
-        }
 
         return new ConstantAST(typeName, identifier, value, GetNowLineno());
     }
@@ -314,16 +299,10 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         }
         IsExpectedToken(")");
 
-        if(IsToken(":")){
-            IsExpectedToken(":");
-            returnTypeName = lexer->ReadToken()->GetValue();
-        }
-        else {
-            returnTypeName = "Error";
-        }
+        IsExpectedToken(":");
+        returnTypeName = lexer->ReadToken()->GetValue();
 
         IsExpectedToken("=>");
-        MaybeNewLine();
 
         while(!IsToken("end")) {
             body.push_back(DeclarationExpression());
@@ -338,10 +317,48 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
     return AssignmentExpression();
 }
 
+AbstractSyntaxTree* Parser::ClassExpression() {
+    if(IsToken("class")) {
+        IsExpectedToken("class");
+
+        std::string name = lexer->ReadToken()->GetValue();
+        IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
+        std::vector<AbstractSyntaxTree*> members;
+        std::vector<AccessModifier> membersAccessModifiers;
+
+        IsExpectedToken("=>");
+
+        while(!IsToken("end")) {
+            if(IsToken("public")) {
+                IsExpectedToken("public");
+                membersAccessModifiers.push_back(AccessModifier(PUBLIC));
+            }
+            else if(IsToken("private")) {
+                IsExpectedToken("private");
+                membersAccessModifiers.push_back(AccessModifier(PRIVATE));
+            }
+            else if(IsToken("protected")) {
+                IsExpectedToken("protected");
+                membersAccessModifiers.push_back(AccessModifier(PROTECTED));
+            }
+            else {
+                membersAccessModifiers.push_back(AccessModifier(PRIVATE));
+            }
+
+            members.push_back(DeclarationExpression());
+        }
+        IsExpectedToken("end");
+
+        return new ClassAST(identifier, members, membersAccessModifiers, GetNowLineno());
+    }
+
+    return DeclarationExpression();
+}
+
 AbstractSyntaxTree* Parser::Code() {
     std::vector<AbstractSyntaxTree*> expressions;
     while(!IsToken("EOF")) {
-        expressions.push_back(DeclarationExpression());
+        expressions.push_back(ClassExpression());
     }
 
     return new CodeAST(expressions, GetNowLineno());

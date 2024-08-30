@@ -15,6 +15,10 @@ public:
         throw std::runtime_error(TypeHasNoChildren("ArgmentAST", lineno));
     }
 
+    std::string GetType() {
+        return type;
+    }
+
     std::string OutputCode();
 
 private:
