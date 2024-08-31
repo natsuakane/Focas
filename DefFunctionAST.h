@@ -41,10 +41,14 @@ private:
 
 std::string DefFunctionAST::OutputCode() {
     std::string code = returnType + " " + identifier->OutputCode() + "(";
-    for(int i = 0; i < argments.size(); i++) {
-        code += argments[i]->OutputCode() + ",";
+
+    if(argments.size() != 0) {
+        for(int i = 0; i < argments.size(); i++) {
+            code += argments[i]->OutputCode() + ",";
+        }
+        code = code.substr(0, code.size() - 1);
     }
-    code = code.substr(0, code.size() - 1);
+    
     code += ") {\n" + tree->OutputCode() + "}";
 
     return code;

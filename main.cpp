@@ -16,7 +16,14 @@
 #include <regex>
 
 int main(){
-    Lexer lexer("class AAA => public func a(b : int) : int => b + 10 end end\nlet a : AAA = new AAA(10)\n");
+    std::string codeStr = 
+    "class AAA => \n" 
+        "public con AAA(a : int) => a=a end\n" 
+        "public func a(a : int) : int => b + 10 end\n"
+        "public des AAA() => print(a) end\n"
+    "end\n" 
+    "let a : AAA = new AAA(10)\n";
+    Lexer lexer(codeStr);
 
     Parser parser(&lexer);
     AbstractSyntaxTree* code = parser.GetTree();
