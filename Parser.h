@@ -42,6 +42,10 @@ private:
     Lexer* lexer;
 
     void IsExpectedToken(std::string val) {
+        while(lexer->PeakToken(0)->GetValue() == "EOL") {
+            lexer->ReadToken();
+        }
+
         Token* token = lexer->ReadToken();
         if(val != token->GetValue()) {
             throw std::runtime_error(UnexpectedToken(token->GetValue(), token->GetLineNo()));
@@ -50,7 +54,7 @@ private:
 
     bool IsToken(std::string val) {
         while(lexer->PeakToken(0)->GetValue() == "EOL") {
-            IsExpectedToken("EOL");
+            lexer->ReadToken();
         }
         return val == lexer->PeakToken(0)->GetValue();
     }
@@ -60,11 +64,24 @@ private:
     }
 
     std::string GetTypeName() {
-        return lexer->ReadToken()->GetValue();
+        std::string type = lexer->ReadToken()->GetValue();
+        if(type == "ref") {
+            return lexer->ReadToken()->GetValue() + "*";
+        }
+
+        return type;
     }
 
     std::string GetVarName() {
-        return lexer->ReadToken()->GetValue();
+        std::string name = lexer->ReadToken()->GetValue();
+        if(name == "ref") {
+            return "*" + lexer->ReadToken()->GetValue();
+        }
+        if(name == "add") {
+            return "&" + lexer->ReadToken()->GetValue();
+        }
+
+        return name;
     }
 
     AbstractSyntaxTree* Factor();
@@ -100,7 +117,7 @@ AbstractSyntaxTree* Parser::Factor() {
     }
     else if(lexer->PeakToken(0)->GetType() == Identifier) {
         if(lexer->PeakToken(1)->GetValue() == "(") {
-            std::string name = lexer->ReadToken()->GetValue();
+            std::string name = GetVarName();
             IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
             std::vector<AbstractSyntaxTree*> argments;
 
@@ -121,7 +138,7 @@ AbstractSyntaxTree* Parser::Factor() {
         else if(lexer->PeakToken(0)->GetValue() == "new") {
             IsExpectedToken("new");
 
-            std::string name = lexer->ReadToken()->GetValue();
+            std::string name = GetVarName();
             IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
             std::vector<AbstractSyntaxTree*> argments;
 
@@ -139,7 +156,8 @@ AbstractSyntaxTree* Parser::Factor() {
 
             return new MakeObjectAST(identifier, argments, GetNowLineno());
         }
-        return new IdentifierAST(lexer->ReadToken()->GetValue(), GetNowLineno());
+
+        return new IdentifierAST(GetVarName(), GetNowLineno());
     }
     else if(lexer->PeakToken(0)->GetType() == String) {
         return new StringAST(lexer->ReadToken()->GetValue(), GetNowLineno());
@@ -278,11 +296,11 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken("let");
 
         std::string typeName;
-        std::string varName = lexer->ReadToken()->GetValue();
+        std::string varName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
 
         IsExpectedToken(":");
-        typeName = lexer->ReadToken()->GetValue();
+        typeName = GetTypeName();
 
         IsExpectedToken("=");
         AbstractSyntaxTree* value = PlusExpression();
@@ -293,11 +311,11 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken("const");
 
         std::string typeName;
-        std::string varName = lexer->ReadToken()->GetValue();
+        std::string varName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
 
-            IsExpectedToken(":");
-            typeName = lexer->ReadToken()->GetValue();
+        IsExpectedToken(":");
+        typeName = GetTypeName();
 
         IsExpectedToken("=");
         AbstractSyntaxTree* value = PlusExpression();
@@ -308,7 +326,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken("func");
 
         std::string returnTypeName;
-        std::string funcName = lexer->ReadToken()->GetValue();
+        std::string funcName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(funcName, GetNowLineno());
         std::vector<ArgmentAST*> argments;
         std::vector<AbstractSyntaxTree*> body;
@@ -316,9 +334,9 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
 
         IsExpectedToken("(");
         while(!IsToken(")")) {
-            std::string argmentName = lexer->ReadToken()->GetValue();
+            std::string argmentName = GetVarName();
             IsExpectedToken(":");
-            std::string argmentType = lexer->ReadToken()->GetValue();
+            std::string argmentType = GetTypeName();
 
             IdentifierAST* identifier = new IdentifierAST(argmentName, GetNowLineno());
             argments.push_back(new ArgmentAST(argmentType, identifier, GetNowLineno()));
@@ -332,7 +350,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken(")");
 
         IsExpectedToken(":");
-        returnTypeName = lexer->ReadToken()->GetValue();
+        returnTypeName = GetTypeName();
 
         IsExpectedToken("=>");
 
@@ -348,7 +366,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
     else if(IsToken("con")) {
         IsExpectedToken("con");
 
-        std::string funcName = lexer->ReadToken()->GetValue();
+        std::string funcName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(funcName, GetNowLineno());
         std::vector<ArgmentAST*> argments;
         std::vector<AbstractSyntaxTree*> body;
@@ -356,9 +374,9 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
 
         IsExpectedToken("(");
         while(!IsToken(")")) {
-            std::string argmentName = lexer->ReadToken()->GetValue();
+            std::string argmentName = GetVarName();
             IsExpectedToken(":");
-            std::string argmentType = lexer->ReadToken()->GetValue();
+            std::string argmentType = GetTypeName();
 
             IdentifierAST* identifier = new IdentifierAST(argmentName, GetNowLineno());
             argments.push_back(new ArgmentAST(argmentType, identifier, GetNowLineno()));
@@ -385,7 +403,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
     else if(IsToken("des")) {
         IsExpectedToken("des");
 
-        std::string funcName = lexer->ReadToken()->GetValue();
+        std::string funcName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(funcName, GetNowLineno());
         std::vector<AbstractSyntaxTree*> body;
         CodeAST* code;
@@ -412,7 +430,7 @@ AbstractSyntaxTree* Parser::ClassExpression() {
     if(IsToken("class")) {
         IsExpectedToken("class");
 
-        std::string name = lexer->ReadToken()->GetValue();
+        std::string name = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
         std::vector<AbstractSyntaxTree*> members;
         std::vector<AccessModifier> membersAccessModifiers;
