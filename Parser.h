@@ -28,6 +28,7 @@
 #include "MakeObjectAST.h"
 #include "ConstructorAST.h"
 #include "DestructorAST.h"
+#include "NegativeAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -85,6 +86,7 @@ private:
     }
 
     AbstractSyntaxTree* Factor();
+    AbstractSyntaxTree* UnuOpExp();
     AbstractSyntaxTree* PowerExpression();
     AbstractSyntaxTree* MultiplicationExpression();
     AbstractSyntaxTree* PlusExpression();
@@ -166,12 +168,29 @@ AbstractSyntaxTree* Parser::Factor() {
     throw std::runtime_error(UnexpectedToken(lexer->PeakToken(0)->GetValue(), GetNowLineno()));
 }
 
+AbstractSyntaxTree* Parser::UnuOpExp() {
+    if(IsToken("+")) {
+        IsExpectedToken("+");
+        AbstractSyntaxTree* expression = Factor();
+
+        return expression;
+    }
+    else if(IsToken("-")) {
+        IsExpectedToken("-");
+        AbstractSyntaxTree* expression = Factor();
+
+        return new NegativeAST(expression, GetNowLineno());
+    }
+
+    return Factor();
+}
+
 AbstractSyntaxTree* Parser::PowerExpression() {
-    AbstractSyntaxTree* right = Factor();
+    AbstractSyntaxTree* right = UnuOpExp();
     
     if(IsToken("**")) {
         IsExpectedToken("**");
-        AbstractSyntaxTree* left = PowerExpression();
+        AbstractSyntaxTree* left = UnuOpExp();
         return new PowerAST(right, left, GetNowLineno());
     }
 

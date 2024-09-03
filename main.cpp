@@ -18,17 +18,21 @@
 int main(){
     std::string codeStr = 
     "class AAA => \n" 
-    "   public con AAA(a : int) =>\n"
-    "       a=a\n"
+    "\n"
+    "   public con AAA(a : ref int) =>\n"
+    "       ref a = ref a\n"
     "   end\n" 
-    "   public func a(a : int) : int =>\n"
-    "       b + 10\n" 
+    "\n"
+    "   public func a(b : ref int) : int =>\n"
+    "       ref b + (-10)\n" 
     "   end\n"
+    "\n"
     "   public des AAA() =>\n"
     "       print(a)\n"
     "   end\n"
-    "end\n" 
-    "let a : ref AAA = new AAA(10)\n";
+    "end\n"
+    "let i : int = 10\n"
+    "let a : ref AAA = new AAA(add i)\n";
     Lexer lexer(codeStr);
 
     Parser parser(&lexer);
