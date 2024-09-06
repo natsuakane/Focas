@@ -21,13 +21,16 @@
 #include "CodeAST.h"
 #include "AssignmentAST.h"
 #include "DefFunctionAST.h"
+#include "DefVirtualFunctionAST.h"
 #include "CallFunctionAST.h"
 #include "ArgmentAST.h"
+#include "InterfaceAST.h"
 #include "ClassAST.h"
 #include "AccessModifier.h"
 #include "MakeObjectAST.h"
 #include "ConstructorAST.h"
 #include "DestructorAST.h"
+#include "VirtualDestructorAST.h"
 #include "NegativeAST.h"
 #include "Exceptions.h"
 
@@ -371,6 +374,12 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken(":");
         returnTypeName = GetTypeName();
 
+        if(!IsToken("=>")) {
+            IsExpectedToken("end");
+
+            return new DefVirtualFunctionAST(returnTypeName, identifier, argments, GetNowLineno());
+        }
+
         IsExpectedToken("=>");
 
         while(!IsToken("end")) {
@@ -430,6 +439,12 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken("(");
         IsExpectedToken(")");
 
+        if(!IsToken("=>")) {
+            IsExpectedToken("end");
+
+            return new VirtualDestructorAST(identifier, GetNowLineno());
+        }
+
         IsExpectedToken("=>");
 
         while(!IsToken("end")) {
@@ -448,6 +463,54 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
 AbstractSyntaxTree* Parser::ClassExpression() {
     if(IsToken("class")) {
         IsExpectedToken("class");
+
+        std::string name = GetVarName();
+        IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
+        std::vector<AbstractSyntaxTree*> members;
+        std::vector<AccessModifier> membersAccessModifiers;
+        std::vector<std::string> inheritances;
+
+        if(IsToken(":")) {
+            IsExpectedToken(":");
+
+            while(!IsToken("=>")) {
+                inheritances.push_back(lexer->ReadToken()->GetValue());
+
+                if(IsToken("=>")) {
+                    break;
+                }
+
+                IsExpectedToken(",");
+            }
+        }
+
+        IsExpectedToken("=>");
+
+        while(!IsToken("end")) {
+            if(IsToken("public")) {
+                IsExpectedToken("public");
+                membersAccessModifiers.push_back(AccessModifier(PUBLIC));
+            }
+            else if(IsToken("private")) {
+                IsExpectedToken("private");
+                membersAccessModifiers.push_back(AccessModifier(PRIVATE));
+            }
+            else if(IsToken("protected")) {
+                IsExpectedToken("protected");
+                membersAccessModifiers.push_back(AccessModifier(PROTECTED));
+            }
+            else {
+                membersAccessModifiers.push_back(AccessModifier(PRIVATE));
+            }
+
+            members.push_back(DeclarationExpression());
+        }
+        IsExpectedToken("end");
+
+        return new ClassAST(identifier, inheritances, members, membersAccessModifiers, GetNowLineno());
+    }
+    if(IsToken("interface")) {
+        IsExpectedToken("interface");
 
         std::string name = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
@@ -477,7 +540,7 @@ AbstractSyntaxTree* Parser::ClassExpression() {
         }
         IsExpectedToken("end");
 
-        return new ClassAST(identifier, members, membersAccessModifiers, GetNowLineno());
+        return new InterfaceAST(identifier, members, membersAccessModifiers, GetNowLineno());
     }
 
     return DeclarationExpression();

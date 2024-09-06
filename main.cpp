@@ -17,7 +17,13 @@
 
 int main(){
     std::string codeStr = 
-    "class AAA => \n" 
+    "interface BBB => \n"
+    "\n"
+    "   public func a(b : ref int) : int end\n"
+    "   public des BBB() end\n"
+    "end\n"
+    "\n"
+    "class AAA : BBB => \n" 
     "\n"
     "   public con AAA(a : ref int) =>\n"
     "       ref a = ref a\n"
