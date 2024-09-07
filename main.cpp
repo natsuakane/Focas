@@ -28,7 +28,7 @@ int main(){
     "   public let abc : int = 0\n"
     "\n"
     "   public con AAA(a : ref int) =>\n"
-    "       if((a < 0) + (a == 30)) =>\n"
+    "       if((a < 0) or (a == 30)) =>\n"
     "           abc = -(ref a)"
     "       end\n"
     "       elif(ref a == 0) =>\n"

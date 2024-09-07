@@ -287,15 +287,12 @@ AbstractSyntaxTree* Parser::MultiplicationExpression() {
 }
 
 AbstractSyntaxTree* Parser::PlusExpression() {
-    lexer->SaveQueue();
     AbstractSyntaxTree* right = MultiplicationExpression();
 
     if(IsToken("+")) {
         IsExpectedToken("+");
-        lexer->LoadQueue();
-        AbstractSyntaxTree* right = PlusExpression();
-        AbstractSyntaxTree* left = MultiplicationExpression();
-        /*
+        AbstractSyntaxTree* left = PlusExpression();
+        
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
             AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
@@ -306,13 +303,12 @@ AbstractSyntaxTree* Parser::PlusExpression() {
         catch(std::runtime_error error) {
 
         }
-        */
 
         return new PlusAST(right, left, GetNowLineno());
     }
     else if(IsToken("-")) {
         IsExpectedToken("-");
-        AbstractSyntaxTree* left = MultiplicationExpression();
+        AbstractSyntaxTree* left = PlusExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
@@ -336,7 +332,7 @@ AbstractSyntaxTree* Parser::CompareExpression() {
 
     if(IsToken("==")) {
         IsExpectedToken("==");
-        AbstractSyntaxTree* left = PlusExpression();
+        AbstractSyntaxTree* left = CompareExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
@@ -353,7 +349,7 @@ AbstractSyntaxTree* Parser::CompareExpression() {
     }
     else if(IsToken(">")) {
         IsExpectedToken(">");
-        AbstractSyntaxTree* left = PlusExpression();
+        AbstractSyntaxTree* left = CompareExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
@@ -370,7 +366,7 @@ AbstractSyntaxTree* Parser::CompareExpression() {
     }
     else if(IsToken("<")) {
         IsExpectedToken("<");
-        AbstractSyntaxTree* left = PlusExpression();
+        AbstractSyntaxTree* left = CompareExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
@@ -387,7 +383,7 @@ AbstractSyntaxTree* Parser::CompareExpression() {
     }
     else if(IsToken(">=")) {
         IsExpectedToken(">=");
-        AbstractSyntaxTree* left = PlusExpression();
+        AbstractSyntaxTree* left = CompareExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
@@ -404,7 +400,7 @@ AbstractSyntaxTree* Parser::CompareExpression() {
     }
     else if(IsToken("<=")) {
         IsExpectedToken("<=");
-        AbstractSyntaxTree* left = PlusExpression();
+        AbstractSyntaxTree* left = CompareExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
@@ -428,7 +424,7 @@ AbstractSyntaxTree* Parser::LogicalAndExpression() {
 
     if(IsToken("and")) {
         IsExpectedToken("and");
-        AbstractSyntaxTree* left = CompareExpression();
+        AbstractSyntaxTree* left = LogicalAndExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
@@ -452,7 +448,7 @@ AbstractSyntaxTree* Parser::LogicalOrExpression() {
 
     if(IsToken("or")) {
         IsExpectedToken("or");
-        AbstractSyntaxTree* left = LogicalAndExpression();
+        AbstractSyntaxTree* left = LogicalOrExpression();
 
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
