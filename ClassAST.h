@@ -54,21 +54,21 @@ std::string ClassAST::OutputCode() {
     code += " {\npublic:\n";
     for(int i = 0; i < members.size(); i++) {
         if(membersAccessModifiers[i] == PUBLIC) {
-            code += members[i]->OutputCode() + "\n";
+            code += members[i]->OutputCode() + ";\n";
         }
     }
 
     code += "private:\n";
     for(int i = 0; i < members.size(); i++) {
         if(membersAccessModifiers[i] == PRIVATE) {
-            code += members[i]->OutputCode() + "\n";
+            code += members[i]->OutputCode() + ";\n";
         }
     }
 
     code += "protected:\n";
     for(int i = 0; i < members.size(); i++) {
         if(membersAccessModifiers[i] == PROTECTED) {
-            code += members[i]->OutputCode() + "\n";
+            code += members[i]->OutputCode() + ";\n";
         }
     }
     

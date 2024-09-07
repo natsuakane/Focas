@@ -33,5 +33,5 @@ private:
 };
 
 std::string AssignmentAST::OutputCode() {
-    return  varName->OutputCode() + " = " + tree->OutputCode();
+    return  "(" + varName->OutputCode() + " = " + tree->OutputCode() + ")";
 }

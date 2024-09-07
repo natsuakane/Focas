@@ -42,6 +42,8 @@
 #include "LessThanAST.h"
 #include "MoreThanOrEqualAST.h"
 #include "LessThanOrEqualAST.h"
+#include "AndAST.h"
+#include "OrAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -89,10 +91,10 @@ private:
     std::string GetVarName() {
         std::string name = lexer->ReadToken()->GetValue();
         if(name == "ref") {
-            return "*" + lexer->ReadToken()->GetValue();
+            return "(*" + lexer->ReadToken()->GetValue() + ")";
         }
         if(name == "add") {
-            return "&" + lexer->ReadToken()->GetValue();
+            return "(&" + lexer->ReadToken()->GetValue() + ")";
         }
 
         return name;
@@ -116,6 +118,8 @@ private:
     AbstractSyntaxTree* MultiplicationExpression();
     AbstractSyntaxTree* PlusExpression();
     AbstractSyntaxTree* CompareExpression();
+    AbstractSyntaxTree* LogicalAndExpression();
+    AbstractSyntaxTree* LogicalOrExpression();
     AbstractSyntaxTree* AssignmentExpression();
     AbstractSyntaxTree* DeclarationStatement();
     AbstractSyntaxTree* ClassStatement();
@@ -283,12 +287,15 @@ AbstractSyntaxTree* Parser::MultiplicationExpression() {
 }
 
 AbstractSyntaxTree* Parser::PlusExpression() {
+    lexer->SaveQueue();
     AbstractSyntaxTree* right = MultiplicationExpression();
 
     if(IsToken("+")) {
         IsExpectedToken("+");
-        AbstractSyntaxTree* left = PlusExpression();
-
+        lexer->LoadQueue();
+        AbstractSyntaxTree* right = PlusExpression();
+        AbstractSyntaxTree* left = MultiplicationExpression();
+        /*
         try {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
             AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
@@ -299,6 +306,7 @@ AbstractSyntaxTree* Parser::PlusExpression() {
         catch(std::runtime_error error) {
 
         }
+        */
 
         return new PlusAST(right, left, GetNowLineno());
     }
@@ -415,8 +423,56 @@ AbstractSyntaxTree* Parser::CompareExpression() {
     return right;
 }
 
-AbstractSyntaxTree* Parser::AssignmentExpression() {
+AbstractSyntaxTree* Parser::LogicalAndExpression() {
     AbstractSyntaxTree* right = CompareExpression();
+
+    if(IsToken("and")) {
+        IsExpectedToken("and");
+        AbstractSyntaxTree* left = CompareExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new AndAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
+        return new AndAST(right, left, GetNowLineno());
+    }
+
+    return right;
+}
+
+AbstractSyntaxTree* Parser::LogicalOrExpression() {
+    AbstractSyntaxTree* right = LogicalAndExpression();
+
+    if(IsToken("or")) {
+        IsExpectedToken("or");
+        AbstractSyntaxTree* left = LogicalAndExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new OrAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
+        return new OrAST(right, left, GetNowLineno());
+    }
+
+    return right;
+}
+
+AbstractSyntaxTree* Parser::AssignmentExpression() {
+    AbstractSyntaxTree* right = LogicalOrExpression();
 
     if(IsToken("=")) {
         IsExpectedToken("=");
@@ -441,7 +497,7 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         typeName = GetTypeName();
 
         IsExpectedToken("=");
-        AbstractSyntaxTree* value = CompareExpression();
+        AbstractSyntaxTree* value = LogicalOrExpression();
 
         return new DeclarationAST(typeName, identifier, value, GetNowLineno());
     }
@@ -456,7 +512,7 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         typeName = GetTypeName();
 
         IsExpectedToken("=");
-        AbstractSyntaxTree* value = CompareExpression();
+        AbstractSyntaxTree* value = LogicalOrExpression();
 
         return new ConstantAST(typeName, identifier, value, GetNowLineno());
     }
@@ -700,7 +756,7 @@ AbstractSyntaxTree* Parser::OtherStatements() {
 
         AbstractSyntaxTree* expression1 = DeclarationStatement();
         IsExpectedToken(",");
-        AbstractSyntaxTree* expression2 = CompareExpression();
+        AbstractSyntaxTree* expression2 = LogicalOrExpression();
         IsExpectedToken(",");
         AbstractSyntaxTree* expression3 = AssignmentExpression();
 
