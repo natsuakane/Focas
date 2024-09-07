@@ -32,6 +32,11 @@
 #include "DestructorAST.h"
 #include "VirtualDestructorAST.h"
 #include "NegativeAST.h"
+#include "IfAST.h"
+#include "ForAST.h"
+#include "WhileAST.h"
+#include "ElifAST.h"
+#include "ElseAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -88,14 +93,27 @@ private:
         return name;
     }
 
+    CodeAST* GetBlock() {
+        std::vector<AbstractSyntaxTree*> statements;
+
+        IsExpectedToken("=>");
+        while(!IsToken("end")) {
+            statements.push_back(OtherStatements());
+        }
+        IsExpectedToken("end");
+
+        return new CodeAST(statements, GetNowLineno());
+    }
+
     AbstractSyntaxTree* Factor();
     AbstractSyntaxTree* UnuOpExp();
     AbstractSyntaxTree* PowerExpression();
     AbstractSyntaxTree* MultiplicationExpression();
     AbstractSyntaxTree* PlusExpression();
     AbstractSyntaxTree* AssignmentExpression();
-    AbstractSyntaxTree* DeclarationExpression();
-    AbstractSyntaxTree* ClassExpression();
+    AbstractSyntaxTree* DeclarationStatement();
+    AbstractSyntaxTree* ClassStatement();
+    AbstractSyntaxTree* OtherStatements();
     AbstractSyntaxTree* Code();
 
 };
@@ -107,7 +125,7 @@ AbstractSyntaxTree* Parser::GetTree() {
 AbstractSyntaxTree* Parser::Factor() {
     if(IsToken("(")) {
         IsExpectedToken("(");
-        AbstractSyntaxTree* result = DeclarationExpression();
+        AbstractSyntaxTree* result = DeclarationStatement();
         IsExpectedToken(")");
 
         return result;
@@ -313,7 +331,7 @@ AbstractSyntaxTree* Parser::AssignmentExpression() {
     return right;
 }
 
-AbstractSyntaxTree* Parser::DeclarationExpression() {
+AbstractSyntaxTree* Parser::DeclarationStatement() {
     if(IsToken("let")) {
         IsExpectedToken("let");
 
@@ -383,7 +401,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken("=>");
 
         while(!IsToken("end")) {
-            body.push_back(DeclarationExpression());
+            body.push_back(OtherStatements());
         }
         IsExpectedToken("end");
 
@@ -420,7 +438,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken("=>");
 
         while(!IsToken("end")) {
-            body.push_back(DeclarationExpression());
+            body.push_back(OtherStatements());
         }
         IsExpectedToken("end");
 
@@ -448,7 +466,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
         IsExpectedToken("=>");
 
         while(!IsToken("end")) {
-            body.push_back(DeclarationExpression());
+            body.push_back(OtherStatements());
         }
         IsExpectedToken("end");
 
@@ -460,7 +478,7 @@ AbstractSyntaxTree* Parser::DeclarationExpression() {
     return AssignmentExpression();
 }
 
-AbstractSyntaxTree* Parser::ClassExpression() {
+AbstractSyntaxTree* Parser::ClassStatement() {
     if(IsToken("class")) {
         IsExpectedToken("class");
 
@@ -503,7 +521,7 @@ AbstractSyntaxTree* Parser::ClassExpression() {
                 membersAccessModifiers.push_back(AccessModifier(PRIVATE));
             }
 
-            members.push_back(DeclarationExpression());
+            members.push_back(DeclarationStatement());
         }
         IsExpectedToken("end");
 
@@ -536,20 +554,84 @@ AbstractSyntaxTree* Parser::ClassExpression() {
                 membersAccessModifiers.push_back(AccessModifier(PRIVATE));
             }
 
-            members.push_back(DeclarationExpression());
+            members.push_back(DeclarationStatement());
         }
         IsExpectedToken("end");
 
         return new InterfaceAST(identifier, members, membersAccessModifiers, GetNowLineno());
     }
 
-    return DeclarationExpression();
+    return DeclarationStatement();
+}
+
+AbstractSyntaxTree* Parser::OtherStatements() {
+    if(IsToken("if")) {
+        IsExpectedToken("if");
+        IsExpectedToken("(");
+
+        AbstractSyntaxTree* expression = AssignmentExpression();
+
+        IsExpectedToken(")");
+        
+        CodeAST* block = GetBlock();
+
+        return new IfAST(expression, block, GetNowLineno());
+    }
+    else if(IsToken("elif")) {
+        IsExpectedToken("elif");
+        IsExpectedToken("(");
+
+        AbstractSyntaxTree* expression = AssignmentExpression();
+
+        IsExpectedToken(")");
+        
+        CodeAST* block = GetBlock();
+
+        return new ElifAST(expression, block, GetNowLineno());
+    }
+    else if(IsToken("else")) {
+        IsExpectedToken("else");
+
+        CodeAST* block = GetBlock();
+
+        return new ElseAST(block, GetNowLineno());
+    }
+    else if(IsToken("for")) {
+        IsExpectedToken("for");
+        IsExpectedToken("(");
+
+        AbstractSyntaxTree* expression1 = DeclarationStatement();
+        IsExpectedToken(",");
+        AbstractSyntaxTree* expression2 = PlusExpression();
+        IsExpectedToken(",");
+        AbstractSyntaxTree* expression3 = AssignmentExpression();
+
+        IsExpectedToken(")");
+        
+        CodeAST* block = GetBlock();
+
+        return new ForAST(expression1, expression2, expression3, block, GetNowLineno());
+    }
+    else if(IsToken("while")) {
+        IsExpectedToken("while");
+        IsExpectedToken("(");
+
+        AbstractSyntaxTree* expression = AssignmentExpression();
+
+        IsExpectedToken(")");
+        
+        CodeAST* block = GetBlock();
+
+        return new WhileAST(expression, block, GetNowLineno());
+    }
+
+    return ClassStatement();
 }
 
 AbstractSyntaxTree* Parser::Code() {
     std::vector<AbstractSyntaxTree*> expressions;
     while(!IsToken("EOF")) {
-        expressions.push_back(ClassExpression());
+        expressions.push_back(OtherStatements());
     }
 
     return new CodeAST(expressions, GetNowLineno());
