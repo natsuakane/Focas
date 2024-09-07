@@ -26,7 +26,7 @@ int main(){
     "class AAA : BBB => \n" 
     "\n"
     "   public con AAA(a : ref int) =>\n"
-    "       for(let a : int = 0, i +10, i = i + 1) =>\n"
+    "       for(let a : int = 0, i < 10, i = i + 1) =>\n"
     "           ref a = ref a\n"
     "       end\n"
     "   end\n" 

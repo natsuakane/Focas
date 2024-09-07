@@ -37,6 +37,11 @@
 #include "WhileAST.h"
 #include "ElifAST.h"
 #include "ElseAST.h"
+#include "EqualAST.h"
+#include "MoreThanAST.h"
+#include "LessThanAST.h"
+#include "MoreThanOrEqualAST.h"
+#include "LessThanOrEqualAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -110,6 +115,7 @@ private:
     AbstractSyntaxTree* PowerExpression();
     AbstractSyntaxTree* MultiplicationExpression();
     AbstractSyntaxTree* PlusExpression();
+    AbstractSyntaxTree* CompareExpression();
     AbstractSyntaxTree* AssignmentExpression();
     AbstractSyntaxTree* DeclarationStatement();
     AbstractSyntaxTree* ClassStatement();
@@ -304,7 +310,7 @@ AbstractSyntaxTree* Parser::PlusExpression() {
             AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
             AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
 
-            right = new PlusAST(right, rightOfLeft, GetNowLineno());
+            right = new MinusAST(right, rightOfLeft, GetNowLineno());
             left = leftOfLeft;
         }
         catch(std::runtime_error error) {
@@ -317,8 +323,100 @@ AbstractSyntaxTree* Parser::PlusExpression() {
     return right;
 }
 
-AbstractSyntaxTree* Parser::AssignmentExpression() {
+AbstractSyntaxTree* Parser::CompareExpression() {
     AbstractSyntaxTree* right = PlusExpression();
+
+    if(IsToken("==")) {
+        IsExpectedToken("==");
+        AbstractSyntaxTree* left = PlusExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new EqualAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
+        return new EqualAST(right, left, GetNowLineno());
+    }
+    else if(IsToken(">")) {
+        IsExpectedToken(">");
+        AbstractSyntaxTree* left = PlusExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new MoreThanAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
+        return new MoreThanAST(right, left, GetNowLineno());
+    }
+    else if(IsToken("<")) {
+        IsExpectedToken("<");
+        AbstractSyntaxTree* left = PlusExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new LessThanAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
+        return new LessThanAST(right, left, GetNowLineno());
+    }
+    else if(IsToken(">=")) {
+        IsExpectedToken(">=");
+        AbstractSyntaxTree* left = PlusExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new MoreThanOrEqualAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
+        return new MoreThanOrEqualAST(right, left, GetNowLineno());
+    }
+    else if(IsToken("<=")) {
+        IsExpectedToken("<=");
+        AbstractSyntaxTree* left = PlusExpression();
+
+        try {
+            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
+            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
+
+            right = new LessThanOrEqualAST(right, rightOfLeft, GetNowLineno());
+            left = leftOfLeft;
+        }
+        catch(std::runtime_error error) {
+
+        }
+
+        return new LessThanOrEqualAST(right, left, GetNowLineno());
+    }
+
+    return right;
+}
+
+AbstractSyntaxTree* Parser::AssignmentExpression() {
+    AbstractSyntaxTree* right = CompareExpression();
 
     if(IsToken("=")) {
         IsExpectedToken("=");
@@ -343,7 +441,7 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         typeName = GetTypeName();
 
         IsExpectedToken("=");
-        AbstractSyntaxTree* value = PlusExpression();
+        AbstractSyntaxTree* value = CompareExpression();
 
         return new DeclarationAST(typeName, identifier, value, GetNowLineno());
     }
@@ -358,7 +456,7 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         typeName = GetTypeName();
 
         IsExpectedToken("=");
-        AbstractSyntaxTree* value = PlusExpression();
+        AbstractSyntaxTree* value = CompareExpression();
 
         return new ConstantAST(typeName, identifier, value, GetNowLineno());
     }
@@ -602,7 +700,7 @@ AbstractSyntaxTree* Parser::OtherStatements() {
 
         AbstractSyntaxTree* expression1 = DeclarationStatement();
         IsExpectedToken(",");
-        AbstractSyntaxTree* expression2 = PlusExpression();
+        AbstractSyntaxTree* expression2 = CompareExpression();
         IsExpectedToken(",");
         AbstractSyntaxTree* expression3 = AssignmentExpression();
 
