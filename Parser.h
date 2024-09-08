@@ -44,6 +44,7 @@
 #include "LessThanOrEqualAST.h"
 #include "AndAST.h"
 #include "OrAST.h"
+#include "DotAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -113,6 +114,7 @@ private:
     }
 
     AbstractSyntaxTree* Factor();
+    AbstractSyntaxTree* DotExpression();
     AbstractSyntaxTree* UnuOpExp();
     AbstractSyntaxTree* PowerExpression();
     AbstractSyntaxTree* MultiplicationExpression();
@@ -199,21 +201,35 @@ AbstractSyntaxTree* Parser::Factor() {
     throw std::runtime_error(UnexpectedToken(lexer->PeakToken(0)->GetValue(), GetNowLineno()));
 }
 
+AbstractSyntaxTree* Parser::DotExpression() {
+    AbstractSyntaxTree* left = Factor();
+    AbstractSyntaxTree* right;
+
+    while(IsToken(".")) {
+        IsExpectedToken(".");
+            
+        right = Factor();
+        left = new DotAST(left, right, GetNowLineno());
+    }
+
+    return left;
+}
+
 AbstractSyntaxTree* Parser::UnuOpExp() {
     if(IsToken("+")) {
         IsExpectedToken("+");
-        AbstractSyntaxTree* expression = Factor();
+        AbstractSyntaxTree* expression = DotExpression();
 
         return expression;
     }
     else if(IsToken("-")) {
         IsExpectedToken("-");
-        AbstractSyntaxTree* expression = Factor();
+        AbstractSyntaxTree* expression = DotExpression();
 
         return new NegativeAST(expression, GetNowLineno());
     }
 
-    return Factor();
+    return DotExpression();
 }
 
 AbstractSyntaxTree* Parser::PowerExpression() {

@@ -49,7 +49,8 @@ int main(){
     "   end\n"
     "end\n"
     "let i : int = 10\n"
-    "let a : ref AAA = new AAA(add i)\n";
+    "let a : ref AAA = new AAA(add i)\n"
+    "let b : int = a.abc\n";
     Lexer lexer(codeStr);
 
     Parser parser(&lexer);
