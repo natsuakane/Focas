@@ -6,7 +6,6 @@
 class MinusAST : public AbstractSyntaxTree {
 public:
     MinusAST(AbstractSyntaxTree* tree1, AbstractSyntaxTree* tree2, int lineno) {
-        //最適化処理の時にintに変換
         this->tree1 = tree1;
         this->tree2 = tree2;
         this->lineno = lineno;

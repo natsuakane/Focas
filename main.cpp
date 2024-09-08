@@ -32,15 +32,16 @@ int main(){
     "           abc = -(ref a)"
     "       end\n"
     "       elif(ref a == 0) =>\n"
-    "           abc == 100\n"
+    "           abc = 100\n"
     "       end\n"
     "       else =>\n"
-    "           abc = ref a"
+    "           abc = ref a\n"
+    "           1 * 2 * 3 * 4 * 5\n"
     "       end\n"
     "   end\n" 
     "\n"
     "   public func a(b : ref int) : int =>\n"
-    "       ref b * 5 + 10 * 2\n" 
+    "       ref b * 5 + 10 * 2 + 3\n" 
     "   end\n"
     "\n"
     "   public des AAA() =>\n"
@@ -48,7 +49,8 @@ int main(){
     "   end\n"
     "end\n"
     "let i : int = 10\n"
-    "let a : ref AAA = new AAA(add i)\n";
+    "let a : ref AAA = new AAA(add i)\n"
+    "let b : int = a.abc\n";
     Lexer lexer(codeStr);
 
     Parser parser(&lexer);

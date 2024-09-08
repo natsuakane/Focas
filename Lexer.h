@@ -32,13 +32,15 @@ class Lexer {
         Token* PeakToken(int n);
 
         void SaveQueue() {
-            saveQueue.resize(queue.size());
-            std::copy(queue.begin(), queue.end(), saveQueue.begin());
+            std::deque<Token*> pushedQueue;
+            pushedQueue.resize(queue.size());
+            std::copy(queue.begin(), queue.end(), pushedQueue.begin());
+            saveQueue.push_back(pushedQueue);
         }
 
         void LoadQueue() {
-            queue.resize(saveQueue.size());
-            std::copy(saveQueue.begin(), saveQueue.end(), queue.begin());
+            queue = saveQueue.back();
+            saveQueue.pop_back();
         }
 
     private:
@@ -46,7 +48,7 @@ class Lexer {
         int codePointerInCode;
         int lineno;
         std::deque<Token*> queue;
-        std::deque<Token*> saveQueue;
+        std::deque<std::deque<Token*> > saveQueue;
 
         std::regex identifierRegex;
         std::regex numberRegex;
