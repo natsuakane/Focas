@@ -229,246 +229,121 @@ AbstractSyntaxTree* Parser::PowerExpression() {
 }
 
 AbstractSyntaxTree* Parser::MultiplicationExpression() {
-    AbstractSyntaxTree* right = PowerExpression();
+    AbstractSyntaxTree* left = PowerExpression();
+    AbstractSyntaxTree* right;
 
-    if(IsToken("*")) {
-        IsExpectedToken("*");
-        AbstractSyntaxTree* left = MultiplicationExpression();
-        
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new MultiplicationAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
+    while(IsToken("*") || IsToken("/") || IsToken("%")) {
+        if(IsToken("*")) {
+            IsExpectedToken("*");
+            
+            right = PowerExpression();
+            left = new MultiplicationAST(left, right, GetNowLineno());
         }
-        catch(std::runtime_error error) {
-
+        else if(IsToken("/")) {
+            IsExpectedToken("/");
+            
+            right = PowerExpression();
+            left = new DivisionAST(left, right, GetNowLineno());
         }
-
-        return new MultiplicationAST(right, left, GetNowLineno());
-    }
-    else if(IsToken("/")) {
-        IsExpectedToken("/");
-        AbstractSyntaxTree* left = MultiplicationExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new DivisionAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
+        else if(IsToken("%")) {
+            IsExpectedToken("%");
+            
+            right = PowerExpression();
+            left = new ModAST(left, right, GetNowLineno());
         }
-        catch(std::runtime_error error) {
-
-        }
-
-        return new DivisionAST(right, left, GetNowLineno());
-    }
-    else if(IsToken("%")) {
-        IsExpectedToken("%");
-        AbstractSyntaxTree* left = MultiplicationExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new ModAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
-        }
-        catch(std::runtime_error) {
-
-        }
-
-        return new ModAST(right, left, GetNowLineno());
     }
 
-    return right;
+    return left;
 }
 
 AbstractSyntaxTree* Parser::PlusExpression() {
-    lexer->SaveQueue();
-    AbstractSyntaxTree* right = MultiplicationExpression();
+    AbstractSyntaxTree* left = MultiplicationExpression();
+    AbstractSyntaxTree* right;
 
-    if(IsToken("+")) {
-        IsExpectedToken("+");
-        lexer->LoadQueue();
-        AbstractSyntaxTree* right = PlusExpression();
-        AbstractSyntaxTree* left = MultiplicationExpression();
-        /*
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new PlusAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
+    while(IsToken("+") || IsToken("-")) {
+        if(IsToken("+")) {
+            IsExpectedToken("+");
+            
+            right = MultiplicationExpression();
+            left = new PlusAST(left, right, GetNowLineno());
         }
-        catch(std::runtime_error error) {
-
+        else if(IsToken("-")) {
+            IsExpectedToken("-");
+            
+            right = MultiplicationExpression();
+            left = new MinusAST(left, right, GetNowLineno());
         }
-        */
-
-        return new PlusAST(right, left, GetNowLineno());
-    }
-    else if(IsToken("-")) {
-        IsExpectedToken("-");
-        AbstractSyntaxTree* left = MultiplicationExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new MinusAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
-        }
-        catch(std::runtime_error error) {
-
-        }
-
-        return new MinusAST(right, left, GetNowLineno());
     }
 
-    return right;
+    return left;
 }
 
 AbstractSyntaxTree* Parser::CompareExpression() {
-    AbstractSyntaxTree* right = PlusExpression();
+    AbstractSyntaxTree* left = PlusExpression();
+    AbstractSyntaxTree* right;
 
-    if(IsToken("==")) {
-        IsExpectedToken("==");
-        AbstractSyntaxTree* left = PlusExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new EqualAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
+    while(IsToken("==") || IsToken(">") || IsToken("<") || IsToken(">=") || IsToken("<=")) {
+        if(IsToken("==")) {
+            IsExpectedToken("==");
+            
+            right = PlusExpression();
+            left = new EqualAST(left, right, GetNowLineno());
         }
-        catch(std::runtime_error error) {
-
+        else if(IsToken(">")) {
+            IsExpectedToken(">");
+            
+            right = PlusExpression();
+            left = new MoreThanAST(left, right, GetNowLineno());
         }
-
-        return new EqualAST(right, left, GetNowLineno());
-    }
-    else if(IsToken(">")) {
-        IsExpectedToken(">");
-        AbstractSyntaxTree* left = PlusExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new MoreThanAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
+        else if(IsToken("<")) {
+            IsExpectedToken("<");
+            
+            right = PlusExpression();
+            left = new LessThanAST(left, right, GetNowLineno());
         }
-        catch(std::runtime_error error) {
-
+        else if(IsToken(">=")) {
+            IsExpectedToken(">=");
+            
+            right = PlusExpression();
+            left = new MoreThanOrEqualAST(left, right, GetNowLineno());
         }
-
-        return new MoreThanAST(right, left, GetNowLineno());
-    }
-    else if(IsToken("<")) {
-        IsExpectedToken("<");
-        AbstractSyntaxTree* left = PlusExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new LessThanAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
+        else if(IsToken("<=")) {
+            IsExpectedToken("<=");
+            
+            right = PlusExpression();
+            left = new LessThanOrEqualAST(left, right, GetNowLineno());
         }
-        catch(std::runtime_error error) {
-
-        }
-
-        return new LessThanAST(right, left, GetNowLineno());
-    }
-    else if(IsToken(">=")) {
-        IsExpectedToken(">=");
-        AbstractSyntaxTree* left = PlusExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new MoreThanOrEqualAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
-        }
-        catch(std::runtime_error error) {
-
-        }
-
-        return new MoreThanOrEqualAST(right, left, GetNowLineno());
-    }
-    else if(IsToken("<=")) {
-        IsExpectedToken("<=");
-        AbstractSyntaxTree* left = PlusExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new LessThanOrEqualAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
-        }
-        catch(std::runtime_error error) {
-
-        }
-
-        return new LessThanOrEqualAST(right, left, GetNowLineno());
     }
 
-    return right;
+    return left;
 }
 
 AbstractSyntaxTree* Parser::LogicalAndExpression() {
-    AbstractSyntaxTree* right = CompareExpression();
+    AbstractSyntaxTree* left = CompareExpression();
+    AbstractSyntaxTree* right;
 
-    if(IsToken("and")) {
+    while(IsToken("and")) {
         IsExpectedToken("and");
-        AbstractSyntaxTree* left = CompareExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new AndAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
-        }
-        catch(std::runtime_error error) {
-
-        }
-
-        return new AndAST(right, left, GetNowLineno());
+            
+        right = CompareExpression();
+        left = new AndAST(left, right, GetNowLineno());
     }
 
-    return right;
+    return left;
 }
 
 AbstractSyntaxTree* Parser::LogicalOrExpression() {
-    AbstractSyntaxTree* right = LogicalAndExpression();
+    AbstractSyntaxTree* left = LogicalAndExpression();
+    AbstractSyntaxTree* right;
 
-    if(IsToken("or")) {
+    while(IsToken("or")) {
         IsExpectedToken("or");
-        AbstractSyntaxTree* left = LogicalAndExpression();
-
-        try {
-            AbstractSyntaxTree* rightOfLeft = left->GetChild(0);
-            AbstractSyntaxTree* leftOfLeft = left->GetChild(1);
-
-            right = new OrAST(right, rightOfLeft, GetNowLineno());
-            left = leftOfLeft;
-        }
-        catch(std::runtime_error error) {
-
-        }
-
-        return new OrAST(right, left, GetNowLineno());
+            
+        right = LogicalAndExpression();
+        left = new OrAST(left, right, GetNowLineno());
     }
 
-    return right;
+    return left;
 }
 
 AbstractSyntaxTree* Parser::AssignmentExpression() {

@@ -32,5 +32,5 @@ private:
 };
 
 std::string EqualAST::OutputCode() {
-    return "(" + tree1->OutputCode() + " < " + tree2->OutputCode() + ")";
+    return "(" + tree1->OutputCode() + " == " + tree2->OutputCode() + ")";
 }
