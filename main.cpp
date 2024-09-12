@@ -17,7 +17,7 @@
 
 int main(){
     std::string codeStr = 
-    "include CCC\n"
+    "include CCC : H\n"
     "interface BBB => \n"
     "\n"
     "   public func a(b : ref int) : int end\n"

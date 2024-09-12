@@ -6,8 +6,9 @@
 
 class IncludeAST : public AbstractSyntaxTree {
 public:
-    IncludeAST(AbstractSyntaxTree* fileName, int lineno) {
+    IncludeAST(AbstractSyntaxTree* fileName, bool isHeader, int lineno) {
         this->fileName = fileName;
+        this->isHeader = isHeader;
         this->lineno = lineno;
     }
 
@@ -19,16 +20,17 @@ public:
 
     std::string OutputCode();
 
-private:
-    AbstractSyntaxTree* fileName;
-    int lineno;
-
     ~IncludeAST() {
 
     }
 
+private:
+    AbstractSyntaxTree* fileName;
+    bool isHeader;
+    int lineno;
+
 };
 
 std::string IncludeAST::OutputCode() {
-    return "#include \"" + fileName->OutputCode() + ".cpp\"";
+    return "#include \"" + fileName->OutputCode() + (isHeader ? ".h\"" : ".cpp\"");
 }

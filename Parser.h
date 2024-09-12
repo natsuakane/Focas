@@ -62,7 +62,7 @@ public:
 
 private:
     Lexer* lexer;
-    std::vector<std::string> initialIncludes;
+    std::vector<IncludeAST> initialIncludes;
 
     void IsExpectedToken(std::string val) {
         while(lexer->PeakToken(0)->GetValue() == "EOL") {
@@ -107,8 +107,17 @@ private:
         return name;
     }
 
-    void AddToInitialIncludes(std::string include) {
+    void AddToInitialIncludes(IncludeAST include) {
         initialIncludes.push_back(include);
+    }
+
+    std::string GetInitialIncludesAsString() {
+        std::string code = "";
+        for(int i = 0; i < initialIncludes.size(); i++) {
+            code += initialIncludes[i].OutputCode() = "\n";
+        }
+
+        return code;
     }
 
     CodeAST* GetBlock() {
@@ -248,6 +257,7 @@ AbstractSyntaxTree* Parser::PowerExpression() {
     if(IsToken("**")) {
         IsExpectedToken("**");
         AbstractSyntaxTree* left = UnuOpExp();
+
         return new PowerAST(right, left, GetNowLineno());
     }
 
@@ -397,7 +407,7 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         IsExpectedToken(":");
         typeName = GetTypeName();
 
-        IsExpectedToken("=");
+        IsExpectedToken("=>");
         AbstractSyntaxTree* value = LogicalOrExpression();
 
         return new DeclarationAST(typeName, identifier, value, GetNowLineno());
@@ -412,7 +422,7 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         IsExpectedToken(":");
         typeName = GetTypeName();
 
-        IsExpectedToken("=");
+        IsExpectedToken("=>");
         AbstractSyntaxTree* value = LogicalOrExpression();
 
         return new ConstantAST(typeName, identifier, value, GetNowLineno());
@@ -701,7 +711,22 @@ AbstractSyntaxTree* Parser::OtherStatements() {
 
         AbstractSyntaxTree* fileName = Factor();
 
-        return new IncludeAST(fileName, GetNowLineno());
+        if(IsToken(":")) {
+            IsExpectedToken(":");
+
+            if(IsToken("H")) {
+                IsExpectedToken("H");
+
+                return new IncludeAST(fileName, true, GetNowLineno());
+            }
+            else if(IsToken("F")) {
+                IsExpectedToken("F");
+
+                return new IncludeAST(fileName, false, GetNowLineno());
+            }
+        }
+
+        return new IncludeAST(fileName, false, GetNowLineno());
     }
     else if(IsToken("neitive")) {
         IsExpectedToken("neitive");
