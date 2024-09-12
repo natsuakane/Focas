@@ -17,6 +17,7 @@
 
 int main(){
     std::string codeStr = 
+    "include CCC\n"
     "interface BBB => \n"
     "\n"
     "   public func a(b : ref int) : int end\n"
@@ -29,7 +30,8 @@ int main(){
     "\n"
     "   public con AAA(a : ref int) =>\n"
     "       if((a < 0) or (a == 30)) =>\n"
-    "           abc = -(ref a)"
+    "           abc = -(ref a)\n"
+    "           break\n"
     "       end\n"
     "       elif(ref a == 0) =>\n"
     "           abc = 100\n"
@@ -50,7 +52,10 @@ int main(){
     "end\n"
     "let i : int = 10\n"
     "let a : ref AAA = new AAA(add i)\n"
-    "let b : int = a.abc\n";
+    "let str : string = \"aaa\"\n"
+    "neitive =>\n"
+    "   \"std::string aa = $aa$;\"\n"
+    "end\n";
     Lexer lexer(codeStr);
 
     Parser parser(&lexer);

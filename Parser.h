@@ -45,6 +45,11 @@
 #include "AndAST.h"
 #include "OrAST.h"
 #include "DotAST.h"
+#include "BreakAST.h"
+#include "ReturnAST.h"
+#include "ContinueAST.h"
+#include "IncludeAST.h"
+#include "NeitiveCodeAST.h"
 #include "Exceptions.h"
 
 class Parser {
@@ -57,6 +62,7 @@ public:
 
 private:
     Lexer* lexer;
+    std::vector<std::string> initialIncludes;
 
     void IsExpectedToken(std::string val) {
         while(lexer->PeakToken(0)->GetValue() == "EOL") {
@@ -99,6 +105,10 @@ private:
         }
 
         return name;
+    }
+
+    void AddToInitialIncludes(std::string include) {
+        initialIncludes.push_back(include);
     }
 
     CodeAST* GetBlock() {
@@ -668,6 +678,37 @@ AbstractSyntaxTree* Parser::OtherStatements() {
         CodeAST* block = GetBlock();
 
         return new WhileAST(expression, block, GetNowLineno());
+    }
+    else if(IsToken("break")) {
+        IsExpectedToken("break");
+
+        return new BreakAST(GetNowLineno());
+    }
+    else if(IsToken("continue")) {
+        IsExpectedToken("continue");
+
+        return new ContinueAST(GetNowLineno());
+    }
+    else if(IsToken("return")) {
+        IsExpectedToken("return");
+
+        AbstractSyntaxTree* returnValue = AssignmentExpression();
+
+        return new ReturnAST(returnValue, GetNowLineno());
+    }
+    else if(IsToken("include")) {
+        IsExpectedToken("include");
+
+        AbstractSyntaxTree* fileName = Factor();
+
+        return new IncludeAST(fileName, GetNowLineno());
+    }
+    else if(IsToken("neitive")) {
+        IsExpectedToken("neitive");
+
+        AbstractSyntaxTree* block = GetBlock();
+
+        return new NeitiveCodeAST(block->GetChild(0)->OutputCode(), GetNowLineno());
     }
 
     return ClassStatement();
