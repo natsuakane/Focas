@@ -12,55 +12,110 @@
 #include "ConstantAST.h"
 #include "StringAST.h"
 #include "Parser.h"
+#include "Exceptions.h"
 #include <iostream>
+#include <fstream>
+#include <unistd.h>
 #include <regex>
 
-int main(){
-    std::string codeStr = 
-    "include CCC : H\n"
-    "interface BBB => \n"
-    "\n"
-    "   public func a(b : ref int) : int end\n"
-    "   public des BBB() end\n"
-    "end\n"
-    "\n"
-    "class AAA : BBB => \n" 
-    "\n"
-    "   public let abc : int = 0\n"
-    "\n"
-    "   public con AAA(a : ref int) =>\n"
-    "       if((a < 0) or (a == 30)) =>\n"
-    "           abc = -(ref a)\n"
-    "           break\n"
-    "       end\n"
-    "       elif(ref a == 0) =>\n"
-    "           abc = 100\n"
-    "       end\n"
-    "       else =>\n"
-    "           abc = ref a\n"
-    "           1 * 2 * 3 * 4 * 5\n"
-    "       end\n"
-    "   end\n" 
-    "\n"
-    "   public func a(b : ref int) : int =>\n"
-    "       ref b * 5 + 10 * 2 + 3\n" 
-    "   end\n"
-    "\n"
-    "   public des AAA() =>\n"
-    "       print(a)\n"
-    "   end\n"
-    "end\n"
-    "let i : int = 10\n"
-    "let a : ref AAA = new AAA(add i)\n"
-    "let str : string = \"aaa\"\n"
-    "neitive =>\n"
-    "   \"std::string aa = $aa$;\"\n"
-    "end\n";
-    Lexer lexer(codeStr);
+std::vector<std::string> split_naive(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    std::string item;
+    for (int i = 0; i < s.size(); i++) {
+        char ch = s[i];
 
-    Parser parser(&lexer);
-    AbstractSyntaxTree* code = parser.GetTree();
-    std::cout << code->OutputCode() << std::endl;
+        if (ch == delim) {
+            if (!item.empty())
+                elems.push_back(item);
+            item.clear();
+        }
+        else {
+            item += ch;
+        }
+    }
+    if (!item.empty())
+        elems.push_back(item);
+    return elems;
+}
+
+std::string ReadFile(std::string fileName) {
+    std::ifstream file(fileName);
+
+    if(file.fail()) {
+        std::cerr << CantOpenTheFile(fileName) << std::endl;
+    }
+
+    std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    return str;
+}
+
+void WriteFile(std::string fileName, std::string content) {
+    std::ofstream file(fileName);
+
+    if(file.fail()) {
+        std::cerr << CantOpenTheFile(fileName) << std::endl;
+    }
+
+    file << content << std::endl;
+}
+
+int main(int argc, char* argv[]){
+    std::vector<std::string> inputFileNames;
+    std::vector<std::string> outputFileNames;
+
+    bool isHeaderFile = false;
+    bool isCOption = false;
+
+    int i, opt;
+    while((opt = getopt(argc, argv, "hco:")) != -1) {
+        switch(opt) {
+            case 'h':
+                isHeaderFile = true;
+                break;
+            case 'c':
+                isCOption = true;
+                break;
+            case 'o':
+                outputFileNames.push_back(optarg);
+                break;
+        }
+    }
+
+    while(optind < argc) {
+        inputFileNames.push_back(argv[optind]);
+
+        if(outputFileNames.size() >= inputFileNames.size()) continue;
+
+        std::vector<std::string> SplitedInputFileName = split_naive(inputFileNames.back(), '.');
+        std::vector<std::string> SlicedInPutFileName;
+        SlicedInPutFileName.resize(SplitedInputFileName.size() - 1);
+        std::copy(SplitedInputFileName.begin(), SplitedInputFileName.end() - 1, SlicedInPutFileName.begin());
+
+        std::string outputFileName;
+        for(int i = 0; i < SlicedInPutFileName.size(); i++) {
+            outputFileName += SlicedInPutFileName[i];
+            outputFileName += ".";
+        }
+        outputFileName += isHeaderFile ? "h" : "cpp";
+
+        outputFileNames.push_back(outputFileName);
+
+        optind++;
+    }
+
+    for(int i = 0; i < inputFileNames.size(); i++) {
+        if(i > 0 && !isCOption) {
+            break;
+        }
+
+        std::string codeStr = ReadFile(inputFileNames[i]);
+        Lexer lexer(codeStr);
+        Parser parser(&lexer);
+        AbstractSyntaxTree* code = parser.GetTree();
+
+        WriteFile(outputFileNames[0], code->OutputCode());
+    }
 
     return 0;
 }

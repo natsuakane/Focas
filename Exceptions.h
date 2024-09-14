@@ -33,3 +33,7 @@ std::string TypeHasNoChildrenMoreThan(std::string type, int n, int lineno) {
     return "Error: The type \"" + type + "\" has no children more than " + std::to_string(n)
             + ". " + std::to_string(lineno);
 }
+
+std::string CantOpenTheFile(std::string fileName) {
+    return "Error: Can't open the file \"" + fileName + "\".";
+}

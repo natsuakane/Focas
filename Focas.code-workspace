@@ -55,7 +55,9 @@
 			"regex": "cpp",
 			"unordered_map": "cpp",
 			"vector": "cpp",
-			"queue": "cpp"
+			"queue": "cpp",
+			"fstream": "cpp",
+			"iomanip": "cpp"
 		}
 	}
 }
