@@ -34,6 +34,10 @@ private:
 
     }
 
+    bool DoesNeedSemicolon() {
+        return true;
+    }
+
 };
 
 std::string DefVirtualFunctionAST::OutputCode() {

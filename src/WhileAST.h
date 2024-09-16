@@ -22,6 +22,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
 private:
     AbstractSyntaxTree* expression;
     CodeAST* block;

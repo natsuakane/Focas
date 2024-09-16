@@ -26,6 +26,10 @@ public:
     }
 
     std::string OutputCode();
+    
+    bool DoesNeedSemicolon() {
+        return true;
+    }
 
 private:
     std::vector<AbstractSyntaxTree*> members;
@@ -47,7 +51,7 @@ std::string ClassAST::OutputCode() {
         code += " : ";
         for(int i = 0; i < inheritances.size(); i ++) {
             if(i != 0) code += ", ";
-            code += inheritances[i];
+            code += "public " + inheritances[i];
         }
     }
 

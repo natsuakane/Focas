@@ -31,6 +31,10 @@ private:
 
     }
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
 };
 
 std::string ElifAST::OutputCode() {

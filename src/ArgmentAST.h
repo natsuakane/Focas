@@ -21,6 +21,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
 private:
     std::string type;
     IdentifierAST* identifier;

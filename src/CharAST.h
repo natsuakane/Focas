@@ -15,6 +15,10 @@ public:
     }
 
     std::string OutputCode();
+    
+    bool DoesNeedSemicolon() {
+        return true;
+    }
 
 private:
     Value* value;

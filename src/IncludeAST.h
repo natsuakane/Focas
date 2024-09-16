@@ -6,9 +6,10 @@
 
 class IncludeAST : public AbstractSyntaxTree {
 public:
-    IncludeAST(AbstractSyntaxTree* fileName, bool isHeader, int lineno) {
+    IncludeAST(AbstractSyntaxTree* fileName, bool isHeader, bool isStandard, int lineno) {
         this->fileName = fileName;
         this->isHeader = isHeader;
+        this->isStandard = isStandard;
         this->lineno = lineno;
     }
 
@@ -20,6 +21,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
     ~IncludeAST() {
 
     }
@@ -27,10 +32,15 @@ public:
 private:
     AbstractSyntaxTree* fileName;
     bool isHeader;
+    bool isStandard;
     int lineno;
 
 };
 
 std::string IncludeAST::OutputCode() {
-    return "#include \"" + fileName->OutputCode() + (isHeader ? ".h\"" : ".cpp\"");
+    if(!isStandard) {
+        return "#include \"" + fileName->OutputCode() + (isHeader ? ".h\"" : ".cpp\"");
+    }
+
+    return "#include <" + fileName->OutputCode() + ">";
 }

@@ -20,6 +20,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
 private:
     CodeAST* block;
     int lineno;

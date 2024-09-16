@@ -7,7 +7,7 @@
 class ConstantAST : public AbstractSyntaxTree {
 public:
     ConstantAST(std::string type, IdentifierAST* identifier, AbstractSyntaxTree* tree, int lineno) {
-        this->type = type; //型推論を実装
+        this->type = type;
         this->identifier = identifier;
         this->tree = tree;
         this->lineno = lineno;
@@ -21,6 +21,10 @@ public:
     }
 
     std::string OutputCode();
+    
+    bool DoesNeedSemicolon() {
+        return true;
+    }
 
 private:
     std::string type;

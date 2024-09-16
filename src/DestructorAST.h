@@ -23,6 +23,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
 private:
     IdentifierAST* identifier;
     AbstractSyntaxTree* tree;

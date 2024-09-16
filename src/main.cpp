@@ -109,7 +109,7 @@ int main(int argc, char* argv[]){
             break;
         }
 
-        std::string codeStr = ReadFile(inputFileNames[i]);
+        std::string codeStr = ReadFile(inputFileNames[i]) + "\n";
         Lexer lexer(codeStr);
         Parser parser(&lexer);
         AbstractSyntaxTree* code = parser.GetTree();

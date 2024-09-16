@@ -37,6 +37,10 @@ private:
 
     }
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
 };
 
 std::string DefFunctionAST::OutputCode() {

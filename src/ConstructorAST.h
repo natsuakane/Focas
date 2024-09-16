@@ -24,6 +24,10 @@ public:
     }
 
     std::string OutputCode();
+    
+    bool DoesNeedSemicolon() {
+        return false;
+    }
 
 private:
     std::vector<ArgmentAST*> argments;

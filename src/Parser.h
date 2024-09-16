@@ -197,7 +197,7 @@ AbstractSyntaxTree* Parser::Factor() {
             std::vector<AbstractSyntaxTree*> argments;
 
             IsExpectedToken("(");
-            while(true) {
+            while(!IsToken(")")) {
                 argments.push_back(AssignmentExpression());
                 
                 if(lexer->PeakToken(0)->GetValue() == ")") {
@@ -717,16 +717,16 @@ AbstractSyntaxTree* Parser::OtherStatements() {
             if(IsToken("H")) {
                 IsExpectedToken("H");
 
-                return new IncludeAST(fileName, true, GetNowLineno());
+                return new IncludeAST(fileName, true, false, GetNowLineno());
             }
             else if(IsToken("F")) {
                 IsExpectedToken("F");
 
-                return new IncludeAST(fileName, false, GetNowLineno());
+                return new IncludeAST(fileName, false, false, GetNowLineno());
             }
         }
 
-        return new IncludeAST(fileName, false, GetNowLineno());
+        return new IncludeAST(fileName, false, true, GetNowLineno());
     }
     else if(IsToken("neitive")) {
         IsExpectedToken("neitive");

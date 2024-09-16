@@ -23,6 +23,10 @@ private:
 
     }
 
+    bool DoesNeedSemicolon() {
+        return true;
+    }
+
 };
 
 std::string ContinueAST::OutputCode() {

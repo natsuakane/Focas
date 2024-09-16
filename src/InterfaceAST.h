@@ -25,6 +25,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return true;
+    }
+
 private:
     std::vector<AbstractSyntaxTree*> members;
     std::vector<AccessModifier> membersAccessModifiers;

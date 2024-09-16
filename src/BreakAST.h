@@ -16,6 +16,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return true;
+    }
+
 private:
     int lineno;
 

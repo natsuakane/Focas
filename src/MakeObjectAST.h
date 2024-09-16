@@ -23,6 +23,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return true;
+    }
+
 private:
     std::vector<AbstractSyntaxTree*> argments;
     IdentifierAST* identifier;
@@ -39,7 +43,10 @@ std::string MakeObjectAST::OutputCode() {
     for(int i = 0; i < argments.size(); i++) {
         code += argments[i]->OutputCode() + ",";
     }
-    code = code.substr(0, code.size() - 1);
+    if(argments.size() != 0) {
+        code = code.substr(0, code.size() - 1);
+    }
+    
     code += ")";
 
     return code;

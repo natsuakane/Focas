@@ -1,0 +1,18 @@
+include iostream
+
+func fib(n : int) : int =>
+    if(n == 0) =>
+        return 0
+    end
+    elif(n == 1) =>
+        return 1
+    end
+    else =>
+        return fib(n - 2) + fib(n - 1)
+    end
+end
+
+func main() : int =>
+    neitive => "std::cout << fib(10) << std::endl;" end
+    return 0
+end

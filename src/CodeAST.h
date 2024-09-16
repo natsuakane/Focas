@@ -18,6 +18,10 @@ public:
     }
 
     std::string OutputCode();
+    
+    bool DoesNeedSemicolon() {
+        return false;
+    }
 
 private:
     std::vector<AbstractSyntaxTree *> expressions;
@@ -33,7 +37,13 @@ std::string CodeAST::OutputCode() {
     std::string result = "";
     for(int i = 0; i < expressions.size(); i++) {
         result += expressions[i]->OutputCode();
-        result += ";\n";
+
+        if(expressions[i]->DoesNeedSemicolon()) {
+            result += ";\n";
+        }
+        else {
+            result += "\n";
+        }
     }
 
     return result;

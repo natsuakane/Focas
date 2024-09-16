@@ -26,6 +26,10 @@ public:
 
     std::string OutputCode();
 
+    bool DoesNeedSemicolon() {
+        return false;
+    }
+
 private:
     AbstractSyntaxTree* expression1;
     AbstractSyntaxTree* expression2;
