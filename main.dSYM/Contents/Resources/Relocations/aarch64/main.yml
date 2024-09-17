@@ -557,7 +557,7 @@ relocations:
   - { offsetInCU: 0x3A4CA, offset: 0x3A4CA, size: 0x8, addend: 0x0, symName: __ZN6Parser4CodeEv, symObjAddr: 0x6F94, symBinAddr: 0x1000079D4, symSize: 0x1A8 }
   - { offsetInCU: 0x3A501, offset: 0x3A501, size: 0x8, addend: 0x0, symName: __ZN6Parser6FactorEv, symObjAddr: 0x713C, symBinAddr: 0x100007B7C, symSize: 0xF90 }
   - { offsetInCU: 0x3A5A3, offset: 0x3A5A3, size: 0x8, addend: 0x0, symName: __ZN6Parser7IsTokenENSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE, symObjAddr: 0x80CC, symBinAddr: 0x100008B0C, symSize: 0xD8 }
-  - { offsetInCU: 0x3A5D8, offset: 0x3A5D8, size: 0x8, addend: 0x0, symName: __ZN6Parser15IsExpectedTokenENSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE, symObjAddr: 0x81A4, symBinAddr: 0x100008BE4, symSize: 0x1F4 }
+  - { offsetInCU: 0x3A5D8, offset: 0x3A5D8, size: 0x8, addend: 0x0, symName: __ZN6Parser15AdvanceTokenENSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE, symObjAddr: 0x81A4, symBinAddr: 0x100008BE4, symSize: 0x1F4 }
   - { offsetInCU: 0x3A61B, offset: 0x3A61B, size: 0x8, addend: 0x0, symName: __ZN6Parser20DeclarationStatementEv, symObjAddr: 0x8398, symBinAddr: 0x100008DD8, symSize: 0x248C }
   - { offsetInCU: 0x3A83D, offset: 0x3A83D, size: 0x8, addend: 0x0, symName: __ZNKSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE4findB8ue170006EPKcm, symObjAddr: 0xA824, symBinAddr: 0x10000B264, symSize: 0x74 }
   - { offsetInCU: 0x3A883, offset: 0x3A883, size: 0x8, addend: 0x0, symName: __ZN6Parser12GetNowLinenoEv, symObjAddr: 0xA898, symBinAddr: 0x10000B2D8, symSize: 0x38 }

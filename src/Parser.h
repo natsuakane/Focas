@@ -64,7 +64,7 @@ private:
     Lexer* lexer;
     std::vector<IncludeAST> initialIncludes;
 
-    void IsExpectedToken(std::string val) {
+    void AdvanceToken(std::string val) {
         while(lexer->PeakToken(0)->GetValue() == "EOL") {
             lexer->ReadToken();
         }
@@ -123,11 +123,11 @@ private:
     CodeAST* GetBlock() {
         std::vector<AbstractSyntaxTree*> statements;
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
         while(!IsToken("end")) {
             statements.push_back(OtherStatements());
         }
-        IsExpectedToken("end");
+        AdvanceToken("end");
 
         return new CodeAST(statements, GetNowLineno());
     }
@@ -155,9 +155,9 @@ AbstractSyntaxTree* Parser::GetTree() {
 
 AbstractSyntaxTree* Parser::Factor() {
     if(IsToken("(")) {
-        IsExpectedToken("(");
+        AdvanceToken("(");
         AbstractSyntaxTree* result = DeclarationStatement();
-        IsExpectedToken(")");
+        AdvanceToken(")");
 
         return result;
     }
@@ -175,7 +175,7 @@ AbstractSyntaxTree* Parser::Factor() {
             IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
             std::vector<AbstractSyntaxTree*> argments;
 
-            IsExpectedToken("(");
+            AdvanceToken("(");
             while(true) {
                 argments.push_back(AssignmentExpression());
                 
@@ -183,20 +183,20 @@ AbstractSyntaxTree* Parser::Factor() {
                     break;
                 }
 
-                IsExpectedToken(",");
+                AdvanceToken(",");
             }
-            IsExpectedToken(")");
+            AdvanceToken(")");
 
             return new CallFunctionAST(identifier, argments, GetNowLineno());
         }
         else if(lexer->PeakToken(0)->GetValue() == "new") {
-            IsExpectedToken("new");
+            AdvanceToken("new");
 
             std::string name = GetVarName();
             IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
             std::vector<AbstractSyntaxTree*> argments;
 
-            IsExpectedToken("(");
+            AdvanceToken("(");
             while(!IsToken(")")) {
                 argments.push_back(AssignmentExpression());
                 
@@ -204,9 +204,9 @@ AbstractSyntaxTree* Parser::Factor() {
                     break;
                 }
 
-                IsExpectedToken(",");
+                AdvanceToken(",");
             }
-            IsExpectedToken(")");
+            AdvanceToken(")");
 
             return new MakeObjectAST(identifier, argments, GetNowLineno());
         }
@@ -225,7 +225,7 @@ AbstractSyntaxTree* Parser::DotExpression() {
     AbstractSyntaxTree* right;
 
     while(IsToken(".")) {
-        IsExpectedToken(".");
+        AdvanceToken(".");
             
         right = Factor();
         left = new DotAST(left, right, GetNowLineno());
@@ -236,13 +236,13 @@ AbstractSyntaxTree* Parser::DotExpression() {
 
 AbstractSyntaxTree* Parser::UnuOpExp() {
     if(IsToken("+")) {
-        IsExpectedToken("+");
+        AdvanceToken("+");
         AbstractSyntaxTree* expression = DotExpression();
 
         return expression;
     }
     else if(IsToken("-")) {
-        IsExpectedToken("-");
+        AdvanceToken("-");
         AbstractSyntaxTree* expression = DotExpression();
 
         return new NegativeAST(expression, GetNowLineno());
@@ -255,7 +255,7 @@ AbstractSyntaxTree* Parser::PowerExpression() {
     AbstractSyntaxTree* right = UnuOpExp();
     
     if(IsToken("**")) {
-        IsExpectedToken("**");
+        AdvanceToken("**");
         AbstractSyntaxTree* left = UnuOpExp();
 
         return new PowerAST(right, left, GetNowLineno());
@@ -270,19 +270,19 @@ AbstractSyntaxTree* Parser::MultiplicationExpression() {
 
     while(IsToken("*") || IsToken("/") || IsToken("%")) {
         if(IsToken("*")) {
-            IsExpectedToken("*");
+            AdvanceToken("*");
             
             right = PowerExpression();
             left = new MultiplicationAST(left, right, GetNowLineno());
         }
         else if(IsToken("/")) {
-            IsExpectedToken("/");
+            AdvanceToken("/");
             
             right = PowerExpression();
             left = new DivisionAST(left, right, GetNowLineno());
         }
         else if(IsToken("%")) {
-            IsExpectedToken("%");
+            AdvanceToken("%");
             
             right = PowerExpression();
             left = new ModAST(left, right, GetNowLineno());
@@ -298,13 +298,13 @@ AbstractSyntaxTree* Parser::PlusExpression() {
 
     while(IsToken("+") || IsToken("-")) {
         if(IsToken("+")) {
-            IsExpectedToken("+");
+            AdvanceToken("+");
             
             right = MultiplicationExpression();
             left = new PlusAST(left, right, GetNowLineno());
         }
         else if(IsToken("-")) {
-            IsExpectedToken("-");
+            AdvanceToken("-");
             
             right = MultiplicationExpression();
             left = new MinusAST(left, right, GetNowLineno());
@@ -320,31 +320,31 @@ AbstractSyntaxTree* Parser::CompareExpression() {
 
     while(IsToken("==") || IsToken(">") || IsToken("<") || IsToken(">=") || IsToken("<=")) {
         if(IsToken("==")) {
-            IsExpectedToken("==");
+            AdvanceToken("==");
             
             right = PlusExpression();
             left = new EqualAST(left, right, GetNowLineno());
         }
         else if(IsToken(">")) {
-            IsExpectedToken(">");
+            AdvanceToken(">");
             
             right = PlusExpression();
             left = new MoreThanAST(left, right, GetNowLineno());
         }
         else if(IsToken("<")) {
-            IsExpectedToken("<");
+            AdvanceToken("<");
             
             right = PlusExpression();
             left = new LessThanAST(left, right, GetNowLineno());
         }
         else if(IsToken(">=")) {
-            IsExpectedToken(">=");
+            AdvanceToken(">=");
             
             right = PlusExpression();
             left = new MoreThanOrEqualAST(left, right, GetNowLineno());
         }
         else if(IsToken("<=")) {
-            IsExpectedToken("<=");
+            AdvanceToken("<=");
             
             right = PlusExpression();
             left = new LessThanOrEqualAST(left, right, GetNowLineno());
@@ -359,7 +359,7 @@ AbstractSyntaxTree* Parser::LogicalAndExpression() {
     AbstractSyntaxTree* right;
 
     while(IsToken("and")) {
-        IsExpectedToken("and");
+        AdvanceToken("and");
             
         right = CompareExpression();
         left = new AndAST(left, right, GetNowLineno());
@@ -373,7 +373,7 @@ AbstractSyntaxTree* Parser::LogicalOrExpression() {
     AbstractSyntaxTree* right;
 
     while(IsToken("or")) {
-        IsExpectedToken("or");
+        AdvanceToken("or");
             
         right = LogicalAndExpression();
         left = new OrAST(left, right, GetNowLineno());
@@ -386,7 +386,7 @@ AbstractSyntaxTree* Parser::AssignmentExpression() {
     AbstractSyntaxTree* right = LogicalOrExpression();
 
     if(IsToken("=")) {
-        IsExpectedToken("=");
+        AdvanceToken("=");
 
         AbstractSyntaxTree* left = AssignmentExpression();
 
@@ -398,37 +398,37 @@ AbstractSyntaxTree* Parser::AssignmentExpression() {
 
 AbstractSyntaxTree* Parser::DeclarationStatement() {
     if(IsToken("let")) {
-        IsExpectedToken("let");
+        AdvanceToken("let");
 
         std::string typeName;
         std::string varName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
 
-        IsExpectedToken(":");
+        AdvanceToken(":");
         typeName = GetTypeName();
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
         AbstractSyntaxTree* value = LogicalOrExpression();
 
         return new DeclarationAST(typeName, identifier, value, GetNowLineno());
     }
     else if(IsToken("const")) {
-        IsExpectedToken("const");
+        AdvanceToken("const");
 
         std::string typeName;
         std::string varName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(varName, GetNowLineno());
 
-        IsExpectedToken(":");
+        AdvanceToken(":");
         typeName = GetTypeName();
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
         AbstractSyntaxTree* value = LogicalOrExpression();
 
         return new ConstantAST(typeName, identifier, value, GetNowLineno());
     }
     else if(IsToken("func")) {
-        IsExpectedToken("func");
+        AdvanceToken("func");
 
         std::string returnTypeName;
         std::string funcName = GetVarName();
@@ -437,10 +437,10 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         std::vector<AbstractSyntaxTree*> body;
         CodeAST* code;
 
-        IsExpectedToken("(");
+        AdvanceToken("(");
         while(!IsToken(")")) {
             std::string argmentName = GetVarName();
-            IsExpectedToken(":");
+            AdvanceToken(":");
             std::string argmentType = GetTypeName();
 
             IdentifierAST* identifier = new IdentifierAST(argmentName, GetNowLineno());
@@ -450,32 +450,32 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
                 break;
             }
 
-            IsExpectedToken(",");
+            AdvanceToken(",");
         }
-        IsExpectedToken(")");
+        AdvanceToken(")");
 
-        IsExpectedToken(":");
+        AdvanceToken(":");
         returnTypeName = GetTypeName();
 
         if(!IsToken("=>")) {
-            IsExpectedToken("end");
+            AdvanceToken("end");
 
             return new DefVirtualFunctionAST(returnTypeName, identifier, argments, GetNowLineno());
         }
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
 
         while(!IsToken("end")) {
             body.push_back(OtherStatements());
         }
-        IsExpectedToken("end");
+        AdvanceToken("end");
 
         code = new CodeAST(body, GetNowLineno());
 
         return new DefFunctionAST(returnTypeName, identifier, argments, code, GetNowLineno());
     }
     else if(IsToken("con")) {
-        IsExpectedToken("con");
+        AdvanceToken("con");
 
         std::string funcName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(funcName, GetNowLineno());
@@ -483,10 +483,10 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
         std::vector<AbstractSyntaxTree*> body;
         CodeAST* code;
 
-        IsExpectedToken("(");
+        AdvanceToken("(");
         while(!IsToken(")")) {
             std::string argmentName = GetVarName();
-            IsExpectedToken(":");
+            AdvanceToken(":");
             std::string argmentType = GetTypeName();
 
             IdentifierAST* identifier = new IdentifierAST(argmentName, GetNowLineno());
@@ -496,44 +496,44 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
                 break;
             }
 
-            IsExpectedToken(",");
+            AdvanceToken(",");
         }
-        IsExpectedToken(")");
+        AdvanceToken(")");
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
 
         while(!IsToken("end")) {
             body.push_back(OtherStatements());
         }
-        IsExpectedToken("end");
+        AdvanceToken("end");
 
         code = new CodeAST(body, GetNowLineno());
 
         return new ConstructorAST(identifier, argments, code, GetNowLineno());
     }
     else if(IsToken("des")) {
-        IsExpectedToken("des");
+        AdvanceToken("des");
 
         std::string funcName = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(funcName, GetNowLineno());
         std::vector<AbstractSyntaxTree*> body;
         CodeAST* code;
 
-        IsExpectedToken("(");
-        IsExpectedToken(")");
+        AdvanceToken("(");
+        AdvanceToken(")");
 
         if(!IsToken("=>")) {
-            IsExpectedToken("end");
+            AdvanceToken("end");
 
             return new VirtualDestructorAST(identifier, GetNowLineno());
         }
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
 
         while(!IsToken("end")) {
             body.push_back(OtherStatements());
         }
-        IsExpectedToken("end");
+        AdvanceToken("end");
 
         code = new CodeAST(body, GetNowLineno());
 
@@ -545,7 +545,7 @@ AbstractSyntaxTree* Parser::DeclarationStatement() {
 
 AbstractSyntaxTree* Parser::ClassStatement() {
     if(IsToken("class")) {
-        IsExpectedToken("class");
+        AdvanceToken("class");
 
         std::string name = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
@@ -554,7 +554,7 @@ AbstractSyntaxTree* Parser::ClassStatement() {
         std::vector<std::string> inheritances;
 
         if(IsToken(":")) {
-            IsExpectedToken(":");
+            AdvanceToken(":");
 
             while(!IsToken("=>")) {
                 inheritances.push_back(lexer->ReadToken()->GetValue());
@@ -563,23 +563,23 @@ AbstractSyntaxTree* Parser::ClassStatement() {
                     break;
                 }
 
-                IsExpectedToken(",");
+                AdvanceToken(",");
             }
         }
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
 
         while(!IsToken("end")) {
             if(IsToken("public")) {
-                IsExpectedToken("public");
+                AdvanceToken("public");
                 membersAccessModifiers.push_back(AccessModifier(PUBLIC));
             }
             else if(IsToken("private")) {
-                IsExpectedToken("private");
+                AdvanceToken("private");
                 membersAccessModifiers.push_back(AccessModifier(PRIVATE));
             }
             else if(IsToken("protected")) {
-                IsExpectedToken("protected");
+                AdvanceToken("protected");
                 membersAccessModifiers.push_back(AccessModifier(PROTECTED));
             }
             else {
@@ -588,31 +588,31 @@ AbstractSyntaxTree* Parser::ClassStatement() {
 
             members.push_back(DeclarationStatement());
         }
-        IsExpectedToken("end");
+        AdvanceToken("end");
 
         return new ClassAST(identifier, inheritances, members, membersAccessModifiers, GetNowLineno());
     }
     if(IsToken("interface")) {
-        IsExpectedToken("interface");
+        AdvanceToken("interface");
 
         std::string name = GetVarName();
         IdentifierAST* identifier = new IdentifierAST(name, GetNowLineno());
         std::vector<AbstractSyntaxTree*> members;
         std::vector<AccessModifier> membersAccessModifiers;
 
-        IsExpectedToken("=>");
+        AdvanceToken("=>");
 
         while(!IsToken("end")) {
             if(IsToken("public")) {
-                IsExpectedToken("public");
+                AdvanceToken("public");
                 membersAccessModifiers.push_back(AccessModifier(PUBLIC));
             }
             else if(IsToken("private")) {
-                IsExpectedToken("private");
+                AdvanceToken("private");
                 membersAccessModifiers.push_back(AccessModifier(PRIVATE));
             }
             else if(IsToken("protected")) {
-                IsExpectedToken("protected");
+                AdvanceToken("protected");
                 membersAccessModifiers.push_back(AccessModifier(PROTECTED));
             }
             else {
@@ -621,7 +621,7 @@ AbstractSyntaxTree* Parser::ClassStatement() {
 
             members.push_back(DeclarationStatement());
         }
-        IsExpectedToken("end");
+        AdvanceToken("end");
 
         return new InterfaceAST(identifier, members, membersAccessModifiers, GetNowLineno());
     }
@@ -631,96 +631,96 @@ AbstractSyntaxTree* Parser::ClassStatement() {
 
 AbstractSyntaxTree* Parser::OtherStatements() {
     if(IsToken("if")) {
-        IsExpectedToken("if");
-        IsExpectedToken("(");
+        AdvanceToken("if");
+        AdvanceToken("(");
 
         AbstractSyntaxTree* expression = AssignmentExpression();
 
-        IsExpectedToken(")");
+        AdvanceToken(")");
         
         CodeAST* block = GetBlock();
 
         return new IfAST(expression, block, GetNowLineno());
     }
     else if(IsToken("elif")) {
-        IsExpectedToken("elif");
-        IsExpectedToken("(");
+        AdvanceToken("elif");
+        AdvanceToken("(");
 
         AbstractSyntaxTree* expression = AssignmentExpression();
 
-        IsExpectedToken(")");
+        AdvanceToken(")");
         
         CodeAST* block = GetBlock();
 
         return new ElifAST(expression, block, GetNowLineno());
     }
     else if(IsToken("else")) {
-        IsExpectedToken("else");
+        AdvanceToken("else");
 
         CodeAST* block = GetBlock();
 
         return new ElseAST(block, GetNowLineno());
     }
     else if(IsToken("for")) {
-        IsExpectedToken("for");
-        IsExpectedToken("(");
+        AdvanceToken("for");
+        AdvanceToken("(");
 
         AbstractSyntaxTree* expression1 = DeclarationStatement();
-        IsExpectedToken(",");
+        AdvanceToken(",");
         AbstractSyntaxTree* expression2 = LogicalOrExpression();
-        IsExpectedToken(",");
+        AdvanceToken(",");
         AbstractSyntaxTree* expression3 = AssignmentExpression();
 
-        IsExpectedToken(")");
+        AdvanceToken(")");
         
         CodeAST* block = GetBlock();
 
         return new ForAST(expression1, expression2, expression3, block, GetNowLineno());
     }
     else if(IsToken("while")) {
-        IsExpectedToken("while");
-        IsExpectedToken("(");
+        AdvanceToken("while");
+        AdvanceToken("(");
 
         AbstractSyntaxTree* expression = AssignmentExpression();
 
-        IsExpectedToken(")");
+        AdvanceToken(")");
         
         CodeAST* block = GetBlock();
 
         return new WhileAST(expression, block, GetNowLineno());
     }
     else if(IsToken("break")) {
-        IsExpectedToken("break");
+        AdvanceToken("break");
 
         return new BreakAST(GetNowLineno());
     }
     else if(IsToken("continue")) {
-        IsExpectedToken("continue");
+        AdvanceToken("continue");
 
         return new ContinueAST(GetNowLineno());
     }
     else if(IsToken("return")) {
-        IsExpectedToken("return");
+        AdvanceToken("return");
 
         AbstractSyntaxTree* returnValue = AssignmentExpression();
 
         return new ReturnAST(returnValue, GetNowLineno());
     }
     else if(IsToken("include")) {
-        IsExpectedToken("include");
+        AdvanceToken("include");
 
         AbstractSyntaxTree* fileName = Factor();
 
         if(IsToken(":")) {
-            IsExpectedToken(":");
+            AdvanceToken(":");
 
             if(IsToken("H")) {
-                IsExpectedToken("H");
+                AdvanceToken("H");
 
                 return new IncludeAST(fileName, true, false, GetNowLineno());
             }
             else if(IsToken("F")) {
-                IsExpectedToken("F");
+                AdvanceToken("F");
 
                 return new IncludeAST(fileName, false, false, GetNowLineno());
             }
@@ -729,7 +729,7 @@ AbstractSyntaxTree* Parser::OtherStatements() {
         return new IncludeAST(fileName, false, true, GetNowLineno());
     }
     else if(IsToken("neitive")) {
-        IsExpectedToken("neitive");
+        AdvanceToken("neitive");
 
         AbstractSyntaxTree* block = GetBlock();
 
