@@ -23,7 +23,7 @@ class Lexer {
 
             identifierRegex = std::regex("^[a-zA-Z_][a-zA-Z0-9_]*$");
             numberRegex = std::regex("^(0x|0b|0o)?[0-9]+(\\.[0-9]*)?$");
-            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)|=|:|\\.|,|(\\*\\*)|(=>)|(==)|>|<|(>=)|(<=)$");
+            operatorRegex = std::regex("^\\+|\\-|\\*|/|%|\\(|\\)|=|:|\\.|,|(\\*\\*)|(=>)|(==)|>|<|(>=)|(<=)|\\!|(\\!=)$");
             stringRegex = std::regex("^[^\"]*$");
             frontOfStringRegex = std::regex("^\"$");
         }

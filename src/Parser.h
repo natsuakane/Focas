@@ -38,6 +38,7 @@
 #include "ElifAST.h"
 #include "ElseAST.h"
 #include "EqualAST.h"
+#include "NotEqualAST.h"
 #include "MoreThanAST.h"
 #include "LessThanAST.h"
 #include "MoreThanOrEqualAST.h"
@@ -318,7 +319,7 @@ AbstractSyntaxTree* Parser::CompareExpression() {
     AbstractSyntaxTree* left = PlusExpression();
     AbstractSyntaxTree* right;
 
-    while(IsToken("==") || IsToken(">") || IsToken("<") || IsToken(">=") || IsToken("<=")) {
+    while(IsToken("==") || IsToken(">") || IsToken("<") || IsToken(">=") || IsToken("<=") || IsToken("!=")) {
         if(IsToken("==")) {
             AdvanceToken("==");
             
@@ -348,6 +349,12 @@ AbstractSyntaxTree* Parser::CompareExpression() {
             
             right = PlusExpression();
             left = new LessThanOrEqualAST(left, right, GetNowLineno());
+        }
+        else if(IsToken("!=")) {
+            AdvanceToken("!=");
+            
+            right = PlusExpression();
+            left = new NotEqualAST(left, right, GetNowLineno());
         }
     }
 
