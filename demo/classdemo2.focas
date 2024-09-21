@@ -1,0 +1,32 @@
+include iostream
+neitive => "using namespace std;" end
+
+interface Animal =>
+    public func Cry() : void end
+    public func GetKind() : int end
+    public des Animal() end
+end
+
+class Cat : Animal =>
+    public con Animal() =>
+        neitive =>
+            "cout << $mew(hello)$ << endl;"
+        end
+    end
+
+    public func Cry() : void =>
+        neitive =>
+            "cout << $mew$ << endl;"
+        end
+    end
+
+    public func GetKind() : int =>
+        return 001
+    end
+
+    public des Cat() =>
+        neitive =>
+            "cout << $mew(bye)$ << endl;"
+        end
+    end
+end
