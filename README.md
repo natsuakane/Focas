@@ -38,4 +38,4 @@ If the -o option is not used, the output will be `{input filename}.cpp`.
 
 ## Documentation
 
-To see the grammar of this language, see the Reference.md file.
+To see the syntax of this language, see the docs/Reference.md file.
