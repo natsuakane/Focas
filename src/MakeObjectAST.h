@@ -40,13 +40,12 @@ private:
 
 std::string MakeObjectAST::OutputCode() {
     std::string code = "new " + identifier->OutputCode() + "(";
-    for(int i = 0; i < argments.size(); i++) {
-        code += argments[i]->OutputCode() + ",";
-    }
     if(argments.size() != 0) {
+        for(int i = 0; i < argments.size(); i++) {
+            code += argments[i]->OutputCode() + ",";
+        }
         code = code.substr(0, code.size() - 1);
     }
-    
     code += ")";
 
     return code;

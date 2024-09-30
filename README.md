@@ -39,3 +39,7 @@ If the -o option is not used, the output will be `{input filename}.cpp`.
 ## Documentation
 
 To see the syntax of this language, see the docs/Reference.md file.
+
+## Contribute
+
+If you want to fix a bug or add a new feature, you are welcome to change the code.
