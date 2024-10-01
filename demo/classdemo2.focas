@@ -8,7 +8,7 @@ interface Animal =>
 end
 
 class Cat : Animal =>
-    public con Animal() =>
+    public con Cat() =>
         neitive =>
             "cout << $mew(hello)$ << endl;"
         end

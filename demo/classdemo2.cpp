@@ -10,7 +10,7 @@ protected:
 };
 class Cat : public Animal {
 public:
-Animal) {
+Cat() {
 cout << "mew(hello)" << endl;
 };
 void Cry() {
