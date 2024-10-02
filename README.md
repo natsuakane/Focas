@@ -9,12 +9,14 @@ To install focas, execute these commands.
 If you use **Linux or Mac**
 ```
 $ git clone https://github.com/natsuakane/Focas.git
+$ cd Focas
 $ ./setup_linux_or_mac.sh
 ```
 
 If you use **Windows**
 ```
 > git clone https://github.com/natsuakane/Focas.git
+> cd Focas
 > ./setup_windows.ps1
 ```
 
