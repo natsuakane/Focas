@@ -5,7 +5,7 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 # Specify the source file name
-$SourceFile = "bin\focas"
+$SourceFile = "build\focas"
 
 # Specify the destination directory (typically System32 folder for Windows)
 $DestDir = "$env:windir\System32"
