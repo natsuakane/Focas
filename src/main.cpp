@@ -79,6 +79,8 @@ int main(int argc, char* argv[]){
             case 'o':
                 outputFileNames.push_back(optarg);
                 break;
+            default:
+                std::cout << "Usage: focas arg1 [-h] [-c] [-o filename]" << std::endl;
         }
     }
 
