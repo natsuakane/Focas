@@ -36,5 +36,5 @@ private:
 };
 
 std::string OrAST::OutputCode() {
-    return "(" + tree1->OutputCode() + " || " + tree2->OutputCode() + ")";
+    return "(" + tree1->OutputCode() + " | " + tree2->OutputCode() + ")";
 }
